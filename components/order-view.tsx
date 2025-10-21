@@ -5,12 +5,17 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Printer, CreditCard } from "lucide-react";
 
+interface Item {
+  name: string;
+  quantity: number;
+  price: number;
+}
 interface Order {
   id: string;
   room: string;
   table: string;
   customerName: string;
-  items: any[];
+  items: Item[];
   total: number;
   status: "Unbilled" | "Draft" | "Paid";
   timestamp: string;
