@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Toaster, toast } from "sonner";
 import { LogOut } from "lucide-react";
-import { MenuBrowser } from "./menu-browser";
+import { MenuBrowser, MenuItem } from "./menu-browser";
 import { OrderSummary } from "./order-summary";
 import { OrdersView } from "./order-view";
 
@@ -13,12 +13,17 @@ interface POSInterfaceProps {
   user: { name: string; role: string } | null;
   onLogout: () => void;
 }
-
+interface posItem {
+  id: string;
+  name: string;
+  price: number;
+  quantity: number;
+}
 export function POSInterface({ user, onLogout }: POSInterfaceProps) {
   const [activeTab, setActiveTab] = useState<"order" | "orders">("order");
   const [selectedRoom, setSelectedRoom] = useState<string>("VIP-1");
   const [selectedTable, setSelectedTable] = useState<string>("1");
-  const [cartItems, setCartItems] = useState<any[]>([]);
+  const [cartItems, setCartItems] = useState<posItem[]>([]);
   const [customerName, setCustomerName] = useState("");
 
   const rooms = [
@@ -29,7 +34,7 @@ export function POSInterface({ user, onLogout }: POSInterfaceProps) {
 
   const currentRoom = rooms.find((r) => r.id === selectedRoom);
 
-  const handleAddItem = (item: any) => {
+  const handleAddItem = (item: MenuItem) => {
     const existingItem = cartItems.find((i) => i.id === item.id);
     if (existingItem) {
       setCartItems(
@@ -76,6 +81,7 @@ export function POSInterface({ user, onLogout }: POSInterfaceProps) {
   return (
     <div className="min-h-screen bg-gray-50">
       <Toaster position="top-right" richColors />
+      {/* Header */}
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 py-6">

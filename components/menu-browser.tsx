@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Plus, Search } from "lucide-react";
 import { useDebounce } from "@/hooks/useDebouce";
 
-interface MenuItem {
+export interface MenuItem {
   id: string;
   name: string;
   category: string;

@@ -5,13 +5,13 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Printer, CreditCard } from "lucide-react";
 
-interface Item {
+export interface Item {
   name: string;
   quantity: number;
   price: number;
 }
 interface Order {
-  id: string;
+    id: string;
   room: string;
   table: string;
   customerName: string;
@@ -28,8 +28,8 @@ const MOCK_ORDERS: Order[] = [
     table: "5",
     customerName: "John Doe",
     items: [
-      { name: "Butter Chicken", quantity: 2, price: 300 },
-      { name: "Biryani", quantity: 1, price: 250 },
+      { name: "Butter Chicken", quantity: 2, price: 300, },
+      { name: "Biryani", quantity: 1, price: 250, },
     ],
     total: 850,
     status: "Unbilled",
@@ -41,7 +41,7 @@ const MOCK_ORDERS: Order[] = [
     table: "12",
     customerName: "Jane Smith",
     items: [
-      { name: "Tandoori Chicken", quantity: 1, price: 280 },
+      { name: "Tandoori Chicken", quantity: 1, price: 280, },
       { name: "Mango Lassi", quantity: 2, price: 100 },
     ],
     total: 480,
