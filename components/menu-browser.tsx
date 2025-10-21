@@ -11,7 +11,7 @@ export interface MenuItem {
   name: string;
   category: string;
   price: number;
-  image: string;
+  image: string | null;
 }
 
 interface MenuBrowserProps {
@@ -24,56 +24,56 @@ const MENU_ITEMS: MenuItem[] = [
     name: "Grilled Fish Curry",
     category: "Main Course",
     price: 320,
-    image: "/grilled-fish-curry.jpg",
+    image: "/grilled-fish.webp",
   },
   {
     id: "2",
     name: "Tandoori Chicken",
     category: "Main Course",
     price: 280,
-    image: "/tandoori-chicken.png",
+    image: "/tandoori.jfif",
   },
   {
     id: "3",
     name: "Butter Chicken",
     category: "Main Course",
     price: 300,
-    image: "/butter-chicken.png",
+    image: "/butter-chicken.jpg",
   },
   {
     id: "4",
     name: "Paneer Tikka",
     category: "Appetizers",
     price: 220,
-    image: "/paneer-tikka.png",
+    image: null,
   },
   {
     id: "5",
     name: "Samosa",
     category: "Appetizers",
     price: 80,
-    image: "/crispy-golden-samosas.png",
+    image: null,
   },
   {
     id: "6",
     name: "Biryani",
     category: "Rice Dishes",
     price: 250,
-    image: "/flavorful-biryani.png",
+    image: null,
   },
   {
     id: "7",
     name: "Coca Cola",
     category: "Beverages",
     price: 60,
-    image: "/refreshing-cola.png",
+    image: null,
   },
   {
     id: "8",
     name: "Mango Lassi",
     category: "Beverages",
     price: 100,
-    image: "/mango-lassi.png",
+    image: null,
   },
 ];
 
@@ -107,7 +107,6 @@ export function MenuBrowser({ onAddItem }: MenuBrowserProps) {
 
   return (
     <div className="space-y-4">
-      {/* Header */}
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-bold text-gray-900">Menu</h2>
         <div className="flex items-center gap-2 bg-white px-3 py-2 rounded-lg border border-gray-300">
@@ -124,7 +123,6 @@ export function MenuBrowser({ onAddItem }: MenuBrowserProps) {
         </div>
       </div>
 
-      {/* Categories */}
       <div className="flex gap-2 overflow-x-auto pb-2">
         {CATEGORIES.map((category) => (
           <button
@@ -141,7 +139,6 @@ export function MenuBrowser({ onAddItem }: MenuBrowserProps) {
         ))}
       </div>
 
-      {/* Menu Grid */}
       <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
         {filteredItems.map((item) => (
           <Card
@@ -150,9 +147,9 @@ export function MenuBrowser({ onAddItem }: MenuBrowserProps) {
           >
             <div className="aspect-square bg-gray-200 overflow-hidden">
               <img
-                src={item.image || "/placeholder.svg"}
+                src={item.image || "/butter-chicken.jpg"}
                 alt={item.name}
-                className="w-full h-full object-cover"
+                className="w-full h-full object-center"
               />
             </div>
             <div className="p-3">
