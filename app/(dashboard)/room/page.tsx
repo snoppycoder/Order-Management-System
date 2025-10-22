@@ -39,7 +39,7 @@ interface Room {
 
 const ROOM_TYPES = ["VIP", "Standard"];
 
-export default function RoomManagement() {
+export function RoomManagement() {
   const [rooms, setRooms] = useState<Room[]>([
     {
       id: "1",
@@ -171,6 +171,7 @@ export default function RoomManagement() {
   return (
     <div className="min-h-screen bg-background p-6">
       <div className="max-w-7xl mx-auto">
+        {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-foreground mb-2">
             Room & Table Management
@@ -180,6 +181,7 @@ export default function RoomManagement() {
           </p>
         </div>
 
+        {/* Add Room Section */}
         <Card className="mb-8 p-6 border-primary/20">
           <h2 className="text-xl font-semibold text-foreground mb-4">
             Add New Room
@@ -203,7 +205,9 @@ export default function RoomManagement() {
               </Label>
               <Select
                 value={newRoomType}
-                onValueChange={(value: any) => setNewRoomType(value)}
+                onValueChange={(value: "VIP" | "Standard") =>
+                  setNewRoomType(value)
+                }
               >
                 <SelectTrigger id="room-type" className="mt-2">
                   <SelectValue />
@@ -229,6 +233,7 @@ export default function RoomManagement() {
           </div>
         </Card>
 
+        {/* Rooms List */}
         <Tabs defaultValue={rooms[0]?.id} className="w-full">
           <TabsList className="grid w-full gap-2 mb-6 bg-muted p-1 h-auto flex-wrap justify-start">
             {rooms.map((room) => (
@@ -244,6 +249,7 @@ export default function RoomManagement() {
 
           {rooms.map((room) => (
             <TabsContent key={room.id} value={room.id} className="space-y-6">
+              {/* Room Header */}
               <div className="flex items-center justify-between">
                 <div>
                   <h2 className="text-2xl font-bold text-foreground">
@@ -263,6 +269,7 @@ export default function RoomManagement() {
                 </Button>
               </div>
 
+              {/* Visual Layout */}
               <Card className="p-6 border-primary/20">
                 <h3 className="text-lg font-semibold text-foreground mb-4">
                   Room Layout
@@ -287,6 +294,7 @@ export default function RoomManagement() {
                 />
               </Card>
 
+              {/* Add Table Section */}
               <Card className="p-6 border-primary/20">
                 <h3 className="text-lg font-semibold text-foreground mb-4">
                   Add Table to {room.name}
@@ -336,6 +344,7 @@ export default function RoomManagement() {
                 </div>
               </Card>
 
+              {/* Tables Grid */}
               <div>
                 <h3 className="text-lg font-semibold text-foreground mb-4">
                   Tables
@@ -466,7 +475,12 @@ function TableEditForm({
         <Label htmlFor="edit-status" className="text-sm font-medium">
           Status
         </Label>
-        <Select value={status} onValueChange={(value: any) => setStatus(value)}>
+        <Select
+          value={status}
+          onValueChange={(value: "available" | "occupied" | "reserved") =>
+            setStatus(value)
+          }
+        >
           <SelectTrigger id="edit-status" className="mt-2">
             <SelectValue />
           </SelectTrigger>

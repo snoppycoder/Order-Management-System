@@ -11,7 +11,7 @@ interface ProductModalProps {
   isOpen: boolean;
   onClose: () => void;
   onAddToOrder: (
-    item: any,
+    item: MenuItem,
     quantity: number,
     specialInstructions: string,
     selectedVariant: string,
@@ -121,7 +121,6 @@ export function ProductModal({
                 />
               </div>
 
-              {/* Add-ons */}
               <div className="lg:mb-2">
                 <h3 className="text-sm font-semibold text-gray-900 mb-2">
                   Add-ons
