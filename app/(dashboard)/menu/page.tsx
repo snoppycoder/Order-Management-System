@@ -89,7 +89,7 @@ export default function MenuManagement({ user }: MenuManagementInterfaceProps) {
 
   return (
     <div className="pt-6 min-h-screen bg-background">
-      <main className="p-6 ">
+      <main className="p-6 mt-3\">
         <div className="mb-6 flex flex-col gap-4">
           <div className="flex flex-col gap-3">
             <div className="flex lg:flex-row flex-col gap-y-2.5 gap-x-2.5">

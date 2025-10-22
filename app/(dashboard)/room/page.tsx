@@ -39,7 +39,7 @@ interface Room {
 
 const ROOM_TYPES = ["VIP", "Standard"];
 
-export function RoomManagement() {
+export default function RoomManagement() {
   const [rooms, setRooms] = useState<Room[]>([
     {
       id: "1",

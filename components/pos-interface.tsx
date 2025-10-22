@@ -5,10 +5,9 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Toaster, toast } from "sonner";
 
-import { MenuBrowser, MenuItem } from "./menu-browser";
+import { MenuBrowser } from "./menu-browser";
 import { OrderSummary } from "./order-summary";
 import { OrdersView } from "./order-view";
-import { useRouter } from "next/navigation";
 
 interface POSInterfaceProps {
   user: { name: string; role: string } | null;
@@ -20,13 +19,18 @@ interface posItem {
   price: number;
   quantity: number;
 }
+interface Item {
+  id: string;
+  name: string;
+  price: number;
+  quantity?: number; // since we are going from menu order which has no quantity to an order object which does have quantity
+}
 export function POSInterface({ user, onLogout }: POSInterfaceProps) {
   const [activeTab, setActiveTab] = useState<"order" | "orders">("order");
   const [selectedRoom, setSelectedRoom] = useState<string>("VIP-1");
   const [selectedTable, setSelectedTable] = useState<string>("1");
   const [cartItems, setCartItems] = useState<posItem[]>([]);
   const [customerName, setCustomerName] = useState("");
-  const router = useRouter();
 
   const rooms = [
     { id: "VIP-1", tables: 10 },
@@ -36,7 +40,7 @@ export function POSInterface({ user, onLogout }: POSInterfaceProps) {
 
   const currentRoom = rooms.find((r) => r.id === selectedRoom);
 
-  const handleAddItem = (item: any) => {
+  const handleAddItem = (item: Item) => {
     setCartItems((prev) => {
       const existingItem = prev.find((i) => i.id === item.id);
 

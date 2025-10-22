@@ -149,7 +149,7 @@ export function MenuBrowser({ onAddItem }: MenuBrowserProps) {
           <button
             key={category}
             onClick={() => setSelectedCategory(category)}
-            className={`md:px-4 px-2 md:py-2 py-2 text-xs md:text-sm rounded-lg md:rounded-full font-medium whitespace-nowrap transition-colors ${
+            className={`md:px-4 md:py-2 py-2 text-xs md:text-sm rounded-full font-medium whitespace-nowrap transition-colors ${
               selectedCategory === category
                 ? "bg-primary text-white"
                 : "bg-white text-gray-700 border border-gray-300 hover:bg-gray-50"
