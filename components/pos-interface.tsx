@@ -4,10 +4,11 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Toaster, toast } from "sonner";
-import { LogOut } from "lucide-react";
+
 import { MenuBrowser, MenuItem } from "./menu-browser";
 import { OrderSummary } from "./order-summary";
 import { OrdersView } from "./order-view";
+import { useRouter } from "next/navigation";
 
 interface POSInterfaceProps {
   user: { name: string; role: string } | null;
@@ -25,6 +26,7 @@ export function POSInterface({ user, onLogout }: POSInterfaceProps) {
   const [selectedTable, setSelectedTable] = useState<string>("1");
   const [cartItems, setCartItems] = useState<posItem[]>([]);
   const [customerName, setCustomerName] = useState("");
+  const router = useRouter();
 
   const rooms = [
     { id: "VIP-1", tables: 10 },
@@ -34,30 +36,38 @@ export function POSInterface({ user, onLogout }: POSInterfaceProps) {
 
   const currentRoom = rooms.find((r) => r.id === selectedRoom);
 
-  const handleAddItem = (item: MenuItem) => {
-    const existingItem = cartItems.find((i) => i.id === item.id);
-    if (existingItem) {
-      setCartItems(
-        cartItems.map((i) =>
-          i.id === item.id ? { ...i, quantity: i.quantity + 1 } : i
-        )
-      );
-    } else {
-      setCartItems([...cartItems, { ...item, quantity: 1 }]);
-    }
-    console.log(cartItems);
+  const handleAddItem = (item: any) => {
+    setCartItems((prev) => {
+      const existingItem = prev.find((i) => i.id === item.id);
+
+      if (existingItem) {
+        // If the modal passes a quantity, add that amount instead of just +1
+        return prev.map((i) =>
+          i.id === item.id
+            ? { ...i, quantity: i.quantity + (item.quantity || 1) }
+            : i
+        );
+      }
+
+      // Use the quantity from the modal or default to 1
+      return [...prev, { ...item, quantity: item.quantity || 1 }];
+    });
   };
 
-  const handleRemoveItem = (itemId: string) => {
-    setCartItems(cartItems.filter((i) => i.id !== itemId));
+  const handleRemoveItem = (itemId: string, index: number) => {
+    setCartItems(cartItems.filter((_, i) => i !== index));
   };
 
-  const handleUpdateQuantity = (itemId: string, quantity: number) => {
+  const handleUpdateQuantity = (
+    itemId: string,
+    index: number,
+    quantity: number
+  ) => {
     if (quantity <= 0) {
-      handleRemoveItem(itemId);
+      handleRemoveItem(itemId, index);
     } else {
       setCartItems(
-        cartItems.map((i) => (i.id === itemId ? { ...i, quantity } : i))
+        cartItems.map((item, i) => (i === index ? { ...item, quantity } : item))
       );
     }
   };
@@ -67,23 +77,22 @@ export function POSInterface({ user, onLogout }: POSInterfaceProps) {
       toast.error("Please add items to the order");
       return;
     }
-    console.log("Order submitted:", {
-      room: selectedRoom,
-      table: selectedTable,
-      customerName,
-      items: cartItems,
-    });
+
     setCartItems([]);
     setCustomerName("");
     toast.success("Order submitted successfully!");
+
+    setActiveTab("orders");
+
+    setTimeout(() => {
+      document.getElementById("order")?.scrollIntoView({ behavior: "smooth" });
+    }, 100);
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className=" min-h-screen bg-gray-50">
       <Toaster position="top-right" richColors />
-      {/* Header */}
 
-      {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 py-6">
         {/* Tabs */}
         <div className="flex gap-2 mb-6">
@@ -115,7 +124,7 @@ export function POSInterface({ user, onLogout }: POSInterfaceProps) {
               <MenuBrowser onAddItem={handleAddItem} />
             </div>
 
-            <div className="space-y-4">
+            <div className="space-y-4 lg:sticky lg:top-6 self-start h-fit">
               <Card className="p-4">
                 <h3 className="font-semibold text-gray-900 mb-3">
                   Room & Table

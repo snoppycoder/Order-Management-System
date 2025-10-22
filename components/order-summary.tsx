@@ -4,17 +4,20 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Trash2, Plus, Minus } from "lucide-react";
 
-interface OrderItem {
+export interface OrderItem {
   id: string;
   name: string;
+  addOns?: string[];
   price: number;
+  variant?: string;
   quantity: number;
+  specialInstructions?: string;
 }
 
 interface OrderSummaryProps {
   items: OrderItem[];
-  onRemoveItem: (itemId: string) => void;
-  onUpdateQuantity: (itemId: string, quantity: number) => void;
+  onRemoveItem: (itemId: string, index: number) => void;
+  onUpdateQuantity: (itemId: string, index: number, quantity: number) => void;
   onSubmitOrder: () => void;
 }
 
@@ -24,13 +27,36 @@ export function OrderSummary({
   onUpdateQuantity,
   onSubmitOrder,
 }: OrderSummaryProps) {
+  const calculateItemPrice = (item: OrderItem) => {
+    let price = item.price;
+
+    // Add variant price if different from base price
+    if (item.variant === "Small") price = 249;
+    else if (item.variant === "Medium") price = 299;
+    else if (item.variant === "Large") price = 399;
+
+    // Add add-ons prices
+    if (item.addOns && item.addOns.length > 0) {
+      const addOnPrices: { [key: string]: number } = {
+        Cheese: 29,
+        "Extra Toppings": 49,
+        Bacon: 59,
+        Mushrooms: 39,
+      };
+      item.addOns.forEach((addOn) => {
+        price += addOnPrices[addOn] || 0;
+      });
+    }
+
+    return price;
+  };
   const subtotal = items.reduce(
     (sum, item) => sum + item.price * item.quantity,
     0
   );
   const tax = Math.round(subtotal * 0.05);
   const total = subtotal + tax;
-
+  console.log("Order Summary Items:", items);
   return (
     <Card className="p-4 sticky top-6">
       <h3 className="font-semibold text-gray-900 mb-4">Order Summary</h3>
@@ -42,40 +68,68 @@ export function OrderSummary({
             No items added
           </p>
         ) : (
-          items.map((item) => (
-            <div
-              key={item.id}
-              className="flex items-center justify-between bg-gray-50 p-2 rounded"
-            >
-              <div className="flex-1">
-                <p className="text-sm font-medium text-gray-900">{item.name}</p>
-                <p className="text-xs text-gray-500">₹{item.price}</p>
+          items.map((item, index) => {
+            const itemPrice = calculateItemPrice(item);
+            return (
+              <div
+                key={`${item.id}-${index}`}
+                className="bg-gray-50 p-3 rounded border border-gray-200"
+              >
+                <div className="flex items-start justify-between mb-2">
+                  <div className="flex-1">
+                    <p className="text-sm font-medium text-gray-900">
+                      {item.name}
+                    </p>
+                    {item.variant && (
+                      <p className="text-xs text-gray-500">{item.variant}</p>
+                    )}
+                    {item.addOns && item.addOns.length > 0 && (
+                      <p className="text-xs text-gray-500">
+                        +{item.addOns.join(", ")}
+                      </p>
+                    )}
+                    {item.specialInstructions && (
+                      <p className="text-xs text-blue-600 italic mt-1">
+                        Note: {item.specialInstructions}
+                      </p>
+                    )}
+                  </div>
+                  <p className="text-sm font-semibold text-gray-900">
+                    {itemPrice} Birr
+                  </p>
+                </div>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() =>
+                        onUpdateQuantity(item.id, index, item.quantity - 1)
+                      }
+                      className="p-1 hover:bg-gray-200 rounded"
+                    >
+                      <Minus className="w-3 h-3" />
+                    </button>
+                    <span className="w-6 text-center text-sm font-medium">
+                      {item.quantity}
+                    </span>
+                    <button
+                      onClick={() =>
+                        onUpdateQuantity(item.id, index, item.quantity + 1)
+                      }
+                      className="p-1 hover:bg-gray-200 rounded"
+                    >
+                      <Plus className="w-3 h-3" />
+                    </button>
+                  </div>
+                  <button
+                    onClick={() => onRemoveItem(item.id, index)}
+                    className="p-1 hover:bg-red-100 rounded text-red-600"
+                  >
+                    <Trash2 className="w-3 h-3" />
+                  </button>
+                </div>
               </div>
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={() => onUpdateQuantity(item.id, item.quantity - 1)}
-                  className="p-1 hover:bg-gray-200 rounded"
-                >
-                  <Minus className="w-3 h-3" />
-                </button>
-                <span className="w-6 text-center text-sm font-medium">
-                  {item.quantity}
-                </span>
-                <button
-                  onClick={() => onUpdateQuantity(item.id, item.quantity + 1)}
-                  className="p-1 hover:bg-gray-200 rounded"
-                >
-                  <Plus className="w-3 h-3" />
-                </button>
-                <button
-                  onClick={() => onRemoveItem(item.id)}
-                  className="p-1 hover:bg-red-100 rounded text-red-600"
-                >
-                  <Trash2 className="w-3 h-3" />
-                </button>
-              </div>
-            </div>
-          ))
+            );
+          })
         )}
       </div>
 

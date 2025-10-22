@@ -5,13 +5,17 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Plus, Search } from "lucide-react";
 import { useDebounce } from "@/hooks/useDebouce";
+import { ProductModal } from "./product-modal";
+import { OrderItem } from "./order-summary";
 
 export interface MenuItem {
   id: string;
   name: string;
   category: string;
   price: number;
-  image: string | null;
+  image?: string | "/butter-chicken.jpg";
+  available?: boolean | true;
+  description?: string;
 }
 
 interface MenuBrowserProps {
@@ -45,35 +49,30 @@ const MENU_ITEMS: MenuItem[] = [
     name: "Paneer Tikka",
     category: "Appetizers",
     price: 220,
-    image: null,
   },
   {
     id: "5",
     name: "Samosa",
     category: "Appetizers",
     price: 80,
-    image: null,
   },
   {
     id: "6",
     name: "Biryani",
     category: "Rice Dishes",
     price: 250,
-    image: null,
   },
   {
     id: "7",
     name: "Coca Cola",
     category: "Beverages",
     price: 60,
-    image: null,
   },
   {
     id: "8",
     name: "Mango Lassi",
     category: "Beverages",
     price: 100,
-    image: null,
   },
 ];
 
@@ -90,6 +89,9 @@ export function MenuBrowser({ onAddItem }: MenuBrowserProps) {
   const [selectedCategory, setSelectedCategory] = useState("All Items");
   const [searchTerm, setSearchTerm] = useState("");
   const debouncedQuery = useDebounce(searchTerm, 400);
+  const [selectedProduct, setSelectedProduct] = useState<MenuItem | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
   useEffect(() => {
     if (debouncedQuery) {
       //api calls with debouncedQuery
@@ -104,9 +106,28 @@ export function MenuBrowser({ onAddItem }: MenuBrowserProps) {
       .includes(searchTerm.toLowerCase());
     return matchesCategory && matchesSearch;
   });
-
+  const handleProductClick = (item: MenuItem) => {
+    setSelectedProduct(item);
+    setIsModalOpen(true);
+  };
+  const handleAddFromModal = (
+    item: MenuItem,
+    quantity: number,
+    specialInstructions: string,
+    selectedVariant: string,
+    addOns: string[]
+  ) => {
+    const existingItem = {
+      ...item,
+      quantity,
+      specialInstructions,
+      variant: selectedVariant,
+      addOns,
+    };
+    onAddItem(existingItem);
+  };
   return (
-    <div className="space-y-4">
+    <div className="relative space-y-4">
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-bold text-gray-900">Menu</h2>
         <div className="flex items-center gap-2 bg-white px-3 py-2 rounded-lg border border-gray-300">
@@ -128,7 +149,7 @@ export function MenuBrowser({ onAddItem }: MenuBrowserProps) {
           <button
             key={category}
             onClick={() => setSelectedCategory(category)}
-            className={`px-4 py-2 rounded-full font-medium whitespace-nowrap transition-colors ${
+            className={`md:px-4 px-2 md:py-2 py-2 text-xs md:text-sm rounded-lg md:rounded-full font-medium whitespace-nowrap transition-colors ${
               selectedCategory === category
                 ? "bg-primary text-white"
                 : "bg-white text-gray-700 border border-gray-300 hover:bg-gray-50"
@@ -143,7 +164,11 @@ export function MenuBrowser({ onAddItem }: MenuBrowserProps) {
         {filteredItems.map((item) => (
           <Card
             key={item.id}
-            className="overflow-hidden hover:shadow-lg transition-shadow"
+            className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer"
+            onClick={(e) => {
+              e.stopPropagation();
+              handleProductClick(item);
+            }}
           >
             <div className="aspect-square bg-gray-200 overflow-hidden">
               <img
@@ -162,9 +187,12 @@ export function MenuBrowser({ onAddItem }: MenuBrowserProps) {
                   {item.price} Birr
                 </span>
                 <Button
-                  onClick={() => onAddItem(item)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onAddItem(item);
+                  }}
                   size="sm"
-                  className="bg-primary hover:bg-primary/90 text-white"
+                  className="bg-primary cursor-pointer hover:bg-primary/90 text-white"
                 >
                   <Plus className="w-4 h-4" />
                 </Button>
@@ -173,6 +201,12 @@ export function MenuBrowser({ onAddItem }: MenuBrowserProps) {
           </Card>
         ))}
       </div>
+      <ProductModal
+        item={selectedProduct}
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onAddToOrder={handleAddFromModal}
+      />
     </div>
   );
 }

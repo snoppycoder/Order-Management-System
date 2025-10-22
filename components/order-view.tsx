@@ -5,13 +5,14 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Printer, CreditCard } from "lucide-react";
 
+import { Toaster, toast } from "sonner";
 export interface Item {
   name: string;
   quantity: number;
   price: number;
 }
 interface Order {
-    id: string;
+  id: string;
   room: string;
   table: string;
   customerName: string;
@@ -28,8 +29,8 @@ const MOCK_ORDERS: Order[] = [
     table: "5",
     customerName: "John Doe",
     items: [
-      { name: "Butter Chicken", quantity: 2, price: 300, },
-      { name: "Biryani", quantity: 1, price: 250, },
+      { name: "Butter Chicken", quantity: 2, price: 300 },
+      { name: "Biryani", quantity: 1, price: 250 },
     ],
     total: 850,
     status: "Unbilled",
@@ -41,7 +42,7 @@ const MOCK_ORDERS: Order[] = [
     table: "12",
     customerName: "Jane Smith",
     items: [
-      { name: "Tandoori Chicken", quantity: 1, price: 280, },
+      { name: "Tandoori Chicken", quantity: 1, price: 280 },
       { name: "Mango Lassi", quantity: 2, price: 100 },
     ],
     total: 480,
@@ -59,7 +60,7 @@ export function OrdersView() {
   const filteredOrders = orders.filter((order) => order.status === selectedTab);
 
   const handlePrint = (orderId: string) => {
-    alert(`Printing KOT and receipt for order ${orderId}`);
+    toast.loading(`Printing KOT and receipt for order ${orderId}`);
     // Update status to Draft after printing
     setOrders(
       orders.map((order) =>
@@ -70,14 +71,15 @@ export function OrdersView() {
   };
 
   const handlePayment = (orderId: string) => {
-    alert(`Processing payment for order ${orderId}`);
+    toast.success(`Processing payment for order ${orderId}`);
     // Update status to Paid
     setOrders(orders.filter((order) => order.id !== orderId));
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4" id="order">
       {/* Tabs */}
+      <Toaster position="top-right" richColors />
       <div className="flex gap-2">
         {(["Unbilled", "Draft", "Paid"] as const).map((tab) => (
           <button
@@ -135,15 +137,15 @@ export function OrdersView() {
                     <ul className="text-sm text-gray-600 space-y-1">
                       {order.items.map((item, idx) => (
                         <li key={idx}>
-                          {item.quantity}x {item.name} - ₹
-                          {item.price * item.quantity}
+                          {item.quantity}x {item.name} -
+                          {item.price * item.quantity} Birr
                         </li>
                       ))}
                     </ul>
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="font-bold text-lg text-gray-900">
-                      ₹{order.total}
+                      {order.total} Birr
                     </span>
                     <div className="flex gap-2">
                       {order.status === "Unbilled" && (
