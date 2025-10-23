@@ -2,7 +2,9 @@ import axios from "axios";
 import qs from "qs";
 
 const api = axios.create({
-  baseURL: "https://devssinia.k.frappe.cloud/api",
+  baseURL: process.env.NODE_ENV === 'development' 
+    ? "/api/proxy" 
+    : "https://devssinia.k.frappe.cloud/api",
   withCredentials: true,
 });
 
