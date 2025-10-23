@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { authAPI } from "@/lib/api";
 
 export default function LoginPage() {
   const [username, setUsername] = useState("");
@@ -16,10 +17,15 @@ export default function LoginPage() {
   const router = useRouter();
 
   const handleSubmit = (e: React.FormEvent) => {
-    router.replace("/");
     e.preventDefault();
     if (username && password) {
-      localStorage.setItem("username", username);
+      authAPI.login(username, password).then(({ user }) => {
+        console.log("Logged in user:", user);
+        localStorage.setItem("loggedInUser", JSON.stringify(user));
+        router.replace("/");
+      });
+      // const response = await authAPI.checkHealth();
+      // console.log("Health Check Response:", response);
     }
   };
 
