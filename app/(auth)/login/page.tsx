@@ -16,16 +16,19 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const router = useRouter();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (username && password) {
-      authAPI.login(username, password).then(({ user }) => {
-        console.log("Logged in user:", user);
-        localStorage.setItem("loggedInUser", JSON.stringify(user));
+      // const value = authAPI.login(username, password).then(({ user }) => {
+      //   console.log("Logged in user:", user);
+      //   localStorage.setItem("loggedInUser", JSON.stringify(user));
+      //   router.replace("/");
+      // });
+      const value = await authAPI.login(username, password);
+
+      if (value.message == "Logged In") {
         router.replace("/");
-      });
-      // const response = await authAPI.checkHealth();
-      // console.log("Health Check Response:", response);
+      }
     }
   };
 
@@ -75,7 +78,7 @@ export default function LoginPage() {
             >
               Sign In
             </Button>
-            <p className="text-center text-sm text-gray-600 font-mono">
+            {/* <p className="text-center text-sm text-gray-600 font-mono">
               {"Don't have an account?"}
               <Link
                 href={"/signup"}
@@ -83,7 +86,7 @@ export default function LoginPage() {
               >
                 Sign Up
               </Link>
-            </p>
+            </p> */}
           </form>
         </CardContent>
       </Card>

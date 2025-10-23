@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Toaster, toast } from "sonner";
@@ -8,6 +8,7 @@ import { Toaster, toast } from "sonner";
 import { MenuBrowser } from "./menu-browser";
 import { OrderSummary } from "./order-summary";
 import { OrdersView } from "./order-view";
+import { menuAPI, authAPI } from "@/lib/api";
 
 interface POSInterfaceProps {
   user: { name: string; role: string } | null;
@@ -16,13 +17,13 @@ interface POSInterfaceProps {
 interface posItem {
   id: string;
   name: string;
-  price: number;
+  valuation_rate: number;
   quantity: number;
 }
 interface Item {
   id: string;
   name: string;
-  price: number;
+  valuation_rate: number;
   quantity?: number; // since we are going from menu order which has no quantity to an order object which does have quantity
 }
 export function POSInterface({ user, onLogout }: POSInterfaceProps) {

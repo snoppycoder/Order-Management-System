@@ -14,6 +14,7 @@ import { Bell } from "lucide-react";
 import { Suspense, useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useRouter } from "next/navigation";
+import { authAPI } from "@/lib/api";
 
 export default function RootLayout({
   children,
@@ -24,8 +25,12 @@ export default function RootLayout({
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [user, setUser] = useState<{ name: string; role: string } | null>(null);
 
-  const handleLogout = () => {
-    router.replace("/login");
+  const handleLogout = async () => {
+    const res = await authAPI.logout();
+    console.log(res);
+    // setTimeout(() => {
+    //   router.replace("/login");
+    // }, 3000);
 
     setIsLoggedIn(false);
     setUser(null);

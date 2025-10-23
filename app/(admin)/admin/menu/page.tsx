@@ -19,7 +19,7 @@ export default function MenuManagement({ user }: MenuManagementInterfaceProps) {
       id: "1",
       name: "Margherita Pizza",
       category: "Pizza",
-      price: 299,
+      valuation_rate: 299,
       available: true,
       description: "Classic pizza with tomato, mozzarella, and basil",
     },
@@ -27,7 +27,7 @@ export default function MenuManagement({ user }: MenuManagementInterfaceProps) {
       id: "2",
       name: "Butter Chicken",
       category: "Main Course",
-      price: 349,
+      valuation_rate: 349,
       available: true,
       description: "Tender chicken in creamy tomato sauce",
     },
@@ -194,7 +194,7 @@ export default function MenuManagement({ user }: MenuManagementInterfaceProps) {
 
                 <div className="mb-4 flex items-center justify-between">
                   <span className="text-lg font-bold text-primary">
-                    ₹{item.price}
+                    {item.valuation_rate} Birr
                   </span>
                 </div>
 

@@ -2,9 +2,10 @@ import axios from "axios";
 import qs from "qs";
 
 const api = axios.create({
-  baseURL: process.env.NODE_ENV === 'development' 
-    ? "/api/proxy" 
-    : "https://devssinia.k.frappe.cloud/api",
+  baseURL:
+    process.env.NODE_ENV === "development"
+      ? "/api/proxy"
+      : "https://ruelux.k.erpnext.com/api",
   withCredentials: true,
 });
 
@@ -84,8 +85,22 @@ export const authAPI = {
 };
 
 export const menuAPI = {
+  addMenuItems: async (body: {
+    item_code: string;
+    item_name: string;
+    item_group: string;
+    description: string;
+    stock_uom: "Nos";
+    standard_rate: number;
+  }) => {
+    const response = await api.post("/resource/Item", body);
+    return response.data;
+  },
   getMenuItems: async () => {
-    const response = await api.get("/menu");
+    const response = await api.get(
+      `/resource/Item?fields=["name","item_name","image","description","valuation_rate","item_group","stock_uom"]`
+    );
+
     return response.data;
   },
 };

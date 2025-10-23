@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { POSInterface } from "@/components/pos-interface";
+import { authAPI, menuAPI } from "@/lib/api";
 
 export default function Home() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);

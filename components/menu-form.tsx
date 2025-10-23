@@ -8,6 +8,7 @@ import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { X, Upload } from "lucide-react";
 import { MenuItem } from "./menu-browser";
+import { menuAPI } from "@/lib/api";
 
 interface MenuItemFormProps {
   item: MenuItem | null;
@@ -16,17 +17,10 @@ interface MenuItemFormProps {
 }
 
 export function MenuItemForm({ item, onSave, onClose }: MenuItemFormProps) {
-  function priceConv(price: string) {
-    if (price == "") {
-      return 0;
-    } else {
-      return parseFloat(price);
-    }
-  }
   const [formData, setFormData] = useState({
     name: item?.name || "",
     category: item?.category || "Pizza",
-    price: item?.price ? String(item.price) : "",
+    price: item?.valuation_rate ? String(item.valuation_rate) : "",
     description: item?.description || "",
     available: item?.available ?? true,
     image: item?.image || "",
@@ -58,14 +52,22 @@ export function MenuItemForm({ item, onSave, onClose }: MenuItemFormProps) {
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    menuAPI.addMenuItems({
+      item_name: formData.name,
+      item_code: formData.name,
+      item_group: formData.category,
+      description: formData.description,
+      stock_uom: "Nos",
+      standard_rate: parseFloat(formData.price),
+    });
     const numericPrice = parseFloat(formData.price) || 0;
 
     if (item) {
-      onSave({ ...item, ...formData, price: numericPrice });
+      onSave({ ...item, ...formData, valuation_rate: numericPrice });
     } else {
-      onSave({ ...formData, price: numericPrice });
+      onSave({ ...formData, valuation_rate: numericPrice });
     }
   };
 

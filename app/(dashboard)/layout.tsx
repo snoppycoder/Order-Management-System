@@ -14,6 +14,7 @@ import { Bell } from "lucide-react";
 import { Suspense, useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useRouter } from "next/navigation";
+import { authAPI } from "@/lib/api";
 
 export default function DashboardLayout({
   children,
@@ -24,7 +25,8 @@ export default function DashboardLayout({
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [user, setUser] = useState<{ name: string; role: string } | null>(null);
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    const res = await authAPI.logout();
     router.replace("/login");
 
     setIsLoggedIn(false);

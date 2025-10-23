@@ -7,12 +7,13 @@ import { Plus, Search } from "lucide-react";
 import { useDebounce } from "@/hooks/useDebouce";
 import { ProductModal } from "./product-modal";
 import { OrderItem } from "./order-summary";
+import { menuAPI } from "@/lib/api";
 
 export interface MenuItem {
   id: string;
   name: string;
   category: string;
-  price: number;
+  valuation_rate: number;
   image?: string | "/butter-chicken.jpg";
   available?: boolean | true;
   description?: string;
@@ -21,60 +22,68 @@ export interface MenuItem {
 interface MenuBrowserProps {
   onAddItem: (item: MenuItem) => void;
 }
+interface frappeMenu extends MenuItem {
+  item_code: string;
+  item_name: string;
+  item_group: string;
+  description: string;
+  stock_uom: "Nos";
+  valuation_rate: number;
+}
 
-const MENU_ITEMS: MenuItem[] = [
-  {
-    id: "1",
-    name: "Grilled Fish Curry",
-    category: "Main Course",
-    price: 320,
-    image: "/grilled-fish.webp",
-  },
-  {
-    id: "2",
-    name: "Tandoori Chicken",
-    category: "Main Course",
-    price: 280,
-    image: "/tandoori.jfif",
-  },
-  {
-    id: "3",
-    name: "Butter Chicken",
-    category: "Main Course",
-    price: 300,
-    image: "/butter-chicken.jpg",
-  },
-  {
-    id: "4",
-    name: "Paneer Tikka",
-    category: "Appetizers",
-    price: 220,
-  },
-  {
-    id: "5",
-    name: "Samosa",
-    category: "Appetizers",
-    price: 80,
-  },
-  {
-    id: "6",
-    name: "Biryani",
-    category: "Rice Dishes",
-    price: 250,
-  },
-  {
-    id: "7",
-    name: "Coca Cola",
-    category: "Beverages",
-    price: 60,
-  },
-  {
-    id: "8",
-    name: "Mango Lassi",
-    category: "Beverages",
-    price: 100,
-  },
-];
+// const MENU_ITEMS: MenuItem[] = [
+//   {
+//     id: "1",
+//     name: "Grilled Fish Curry",
+//     category: "Main Course",
+//     price: 320,
+//     image: "/grilled-fish.webp",
+//   },
+//   {
+//     id: "2",
+//     name: "Tandoori Chicken",
+//     category: "Main Course",
+//     price: 280,
+//     image: "/tandoori.jfif",
+//   },
+//   {
+//     id: "3",
+//     name: "Butter Chicken",
+//     category: "Main Course",
+//     price: 300,
+//     image: "/butter-chicken.jpg",
+//   },
+//   {
+//     id: "4",
+//     name: "Paneer Tikka",
+//     category: "Appetizers",
+//     price: 220,
+//   },
+//   {
+//     id: "5",
+//     name: "Samosa",
+//     category: "Appetizers",
+//     price: 80,
+//   },
+//   {
+//     id: "6",
+//     name: "Biryani",
+//     category: "Rice Dishes",
+//     price: 250,
+//   },
+//   {
+//     id: "7",
+//     name: "Coca Cola",
+//     category: "Beverages",
+//     price: 60,
+//   },
+//   {
+//     id: "8",
+//     name: "Mango Lassi",
+//     category: "Beverages",
+//     price: 100,
+//   },
+// ];
 
 const CATEGORIES = [
   "All Items",
@@ -91,6 +100,16 @@ export function MenuBrowser({ onAddItem }: MenuBrowserProps) {
   const debouncedQuery = useDebounce(searchTerm, 400);
   const [selectedProduct, setSelectedProduct] = useState<MenuItem | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [menu, setMenu] = useState<frappeMenu[]>([]);
+  useEffect(() => {
+    const fetchMenu = async () => {
+      const response = await menuAPI.getMenuItems();
+      const items = Array.isArray(response) ? response : response?.data || [];
+      console.log(items);
+      setMenu(items);
+    };
+    fetchMenu();
+  }, []);
 
   useEffect(() => {
     if (debouncedQuery) {
@@ -98,10 +117,10 @@ export function MenuBrowser({ onAddItem }: MenuBrowserProps) {
     }
   }, [debouncedQuery]);
 
-  const filteredItems = MENU_ITEMS.filter((item) => {
+  const filteredItems = menu.filter((item) => {
     const matchesCategory =
-      selectedCategory === "All Items" || item.category === selectedCategory;
-    const matchesSearch = item.name
+      selectedCategory === "All Items" || item.item_group === selectedCategory;
+    const matchesSearch = item.item_name
       .toLowerCase()
       .includes(searchTerm.toLowerCase());
     return matchesCategory && matchesSearch;
@@ -149,7 +168,7 @@ export function MenuBrowser({ onAddItem }: MenuBrowserProps) {
           <button
             key={category}
             onClick={() => setSelectedCategory(category)}
-            className={`md:px-4 md:py-2 py-2 text-xs md:text-sm rounded-full font-medium whitespace-nowrap transition-colors ${
+            className={`md:px-4 md:py-2 p-2 text-xs md:text-sm rounded-full font-medium whitespace-nowrap transition-colors ${
               selectedCategory === category
                 ? "bg-primary text-white"
                 : "bg-white text-gray-700 border border-gray-300 hover:bg-gray-50"
@@ -163,7 +182,7 @@ export function MenuBrowser({ onAddItem }: MenuBrowserProps) {
       <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
         {filteredItems.map((item) => (
           <Card
-            key={item.id}
+            key={item.item_code}
             className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer"
             onClick={(e) => {
               e.stopPropagation();
@@ -179,12 +198,12 @@ export function MenuBrowser({ onAddItem }: MenuBrowserProps) {
             </div>
             <div className="p-3">
               <h3 className="font-semibold text-gray-900 text-sm line-clamp-2">
-                {item.name}
+                {item.item_name}
               </h3>
-              <p className="text-xs text-gray-500 mb-2">{item.category}</p>
+              <p className="text-xs text-gray-500 mb-2">{item.item_group}</p>
               <div className="flex items-center justify-between">
                 <span className="text-lg font-bold text-primary">
-                  {item.price} Birr
+                  {item.valuation_rate} Birr
                 </span>
                 <Button
                   onClick={(e) => {
