@@ -116,7 +116,7 @@ async function handleRequest(
 
     responseHeaders.set(
       "Access-Control-Allow-Origin",
-      "https://order-management-system-psi.vercel.app/"
+      "https://order-management-system-psi.vercel.app"
     );
     responseHeaders.set("Vary", "Origin");
     responseHeaders.set(
@@ -155,7 +155,8 @@ export async function OPTIONS() {
   return new NextResponse(null, {
     status: 200,
     headers: {
-      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Origin":
+        "https://order-management-system-psi.vercel.app",
       "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
       "Access-Control-Allow-Headers": "Content-Type, Authorization, Cookie",
       "Access-Control-Allow-Credentials": "true",
