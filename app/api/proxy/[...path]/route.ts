@@ -33,6 +33,8 @@ export async function DELETE(
   const { path } = await context.params;
   return handleRequest(request, path, "DELETE");
 }
+
+// Main proxy logic
 async function handleRequest(
   request: NextRequest,
   pathSegments: string[],
@@ -42,22 +44,14 @@ async function handleRequest(
     const path = pathSegments.join("/");
     const url = new URL(`${TARGET_URL}/${path}`);
 
-    console.log("Proxy request:", {
-      method,
-      path,
-      targetUrl: url.toString(),
-      headers: Object.fromEntries(request.headers.entries()),
-    });
-
     // Copy query parameters
     request.nextUrl.searchParams.forEach((value, key) => {
       url.searchParams.set(key, value);
     });
 
-    // Prepare headers - preserve important headers
+    // Prepare headers
     const headers = new Headers();
     request.headers.forEach((value, key) => {
-      // Skip problematic headers but keep important ones
       if (
         !["host", "connection", "content-length", "origin", "referer"].includes(
           key.toLowerCase()
@@ -67,17 +61,15 @@ async function handleRequest(
       }
     });
 
-    // Get request body for POST/PUT requests
+    // Get body if needed
     let body: string | undefined;
     if (["POST", "PUT"].includes(method)) {
       body = await request.text();
-      console.log("Proxy forwarding body:", body);
     }
 
-    // Make the proxied request
-    console.log("Making request to:", url.toString());
-    console.log("Request headers:", Object.fromEntries(headers.entries()));
+    console.log(`➡️ Proxying ${method} → ${url}`);
 
+    // Forward the request to the target server
     const response = await fetch(url.toString(), {
       method,
       headers,
@@ -85,23 +77,20 @@ async function handleRequest(
       credentials: "include",
     });
 
-    // Create response with proper headers
+    // Prepare response headers (excluding ERPNext’s CORS)
     const responseHeaders = new Headers();
     response.headers.forEach((value, key) => {
-      // Allow CORS headers
       if (
-        key.toLowerCase().startsWith("access-control") ||
-        key.toLowerCase() === "content-type"
+        !key.toLowerCase().startsWith("access-control") &&
+        key.toLowerCase() !== "vary"
       ) {
         responseHeaders.set(key, value);
       }
     });
-    const setCookies =
-      // Modern API (Next.js 14+)
-      response.headers.getSetCookie?.() ||
-      // Fallback for older environments
-      response.headers.get("set-cookie");
 
+    // Handle cookies from ERPNext
+    const setCookies =
+      response.headers.getSetCookie?.() || response.headers.get("set-cookie");
     if (setCookies) {
       if (Array.isArray(setCookies)) {
         setCookies.forEach((cookie) =>
@@ -112,12 +101,12 @@ async function handleRequest(
       }
     }
 
-    // Add CORS headers
+    // ✅ Override CORS headers for your frontend
     const origin =
       request.headers.get("origin") ||
       "https://order-management-system-psi.vercel.app";
     responseHeaders.set("Access-Control-Allow-Origin", origin);
-    responseHeaders.set("Vary", "Origin");
+    responseHeaders.set("Access-Control-Allow-Credentials", "true");
     responseHeaders.set(
       "Access-Control-Allow-Methods",
       "GET, POST, PUT, DELETE, OPTIONS"
@@ -126,17 +115,12 @@ async function handleRequest(
       "Access-Control-Allow-Headers",
       "Content-Type, Authorization, Cookie"
     );
-    responseHeaders.set("Access-Control-Allow-Credentials", "true");
+    responseHeaders.set("Vary", "Origin");
 
+    // Read and return the response
     const responseBody = await response.text();
 
-    console.log("Proxy response:", {
-      status: response.status,
-      statusText: response.statusText,
-      body:
-        responseBody.substring(0, 200) +
-        (responseBody.length > 200 ? "..." : ""),
-    });
+    console.log(`⬅️ Response: ${response.status} ${response.statusText}`);
 
     return new NextResponse(responseBody, {
       status: response.status,
@@ -144,12 +128,12 @@ async function handleRequest(
       headers: responseHeaders,
     });
   } catch (error) {
-    console.error("Proxy error:", error);
+    console.error("❌ Proxy error:", error);
     return new NextResponse("Proxy Error", { status: 500 });
   }
 }
 
-// Handle OPTIONS requests for CORS preflight
+// Handle CORS preflight
 export async function OPTIONS() {
   return new NextResponse(null, {
     status: 200,
