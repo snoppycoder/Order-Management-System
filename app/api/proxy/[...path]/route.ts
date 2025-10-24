@@ -4,32 +4,35 @@ const TARGET_URL = "https://ruelux.k.erpnext.com/api";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { path: string[] } }
+  context: { params: Promise<{ path: string[] }> }
 ) {
-  return handleRequest(request, params.path, "GET");
+  const { path } = await context.params;
+  return handleRequest(request, path, "GET");
 }
 
-export async function POST(
+eexport async function POST(
   request: NextRequest,
-  { params }: { params: { path: string[] } }
+  context: { params: Promise<{ path: string[] }> }
 ) {
-  return handleRequest(request, params.path, "POST");
+  const { path } = await context.params;
+  return handleRequest(request, path, "POST");
 }
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { path: string[] } }
+  context: { params: Promise<{ path: string[] }> }
 ) {
-  return handleRequest(request, params.path, "PUT");
+  const { path } = await context.params;
+  return handleRequest(request, path, "PUT");
 }
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { path: string[] } }
+  context: { params: Promise<{ path: string[] }> }
 ) {
-  return handleRequest(request, params.path, "DELETE");
+  const { path } = await context.params;
+  return handleRequest(request, path, "DELETE");
 }
-
 async function handleRequest(
   request: NextRequest,
   pathSegments: string[],
