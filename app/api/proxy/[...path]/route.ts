@@ -115,8 +115,7 @@ async function handleRequest(
     // Add CORS headers
     const origin =
       request.headers.get("origin") ||
-      "http://localhost:3000" ||
-      "https://order-management-system-psi.vercel.app/";
+      "https://order-management-system-psi.vercel.app";
     responseHeaders.set("Access-Control-Allow-Origin", origin);
     responseHeaders.set("Vary", "Origin");
     responseHeaders.set(
