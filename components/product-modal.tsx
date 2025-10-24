@@ -46,7 +46,8 @@ export function ProductModal({
   if (!isOpen || !item) return null;
 
   const variantPrice =
-    VARIANTS.find((v) => v.name === selectedVariant)?.price || item.price;
+    VARIANTS.find((v) => v.name === selectedVariant)?.price ||
+    item.valuation_rate;
   const addOnsTotal = selectedAddOns.reduce((sum, addOnName) => {
     const addOn = ADD_ONS.find((a) => a.name === addOnName);
     return sum + (addOn?.price || 0);
