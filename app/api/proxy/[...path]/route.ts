@@ -10,7 +10,7 @@ export async function GET(
   return handleRequest(request, path, "GET");
 }
 
-eexport async function POST(
+export async function POST(
   request: NextRequest,
   context: { params: Promise<{ path: string[] }> }
 ) {
