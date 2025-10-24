@@ -38,31 +38,7 @@ export default function RootLayout({
   };
   return (
     <html lang="en">
-      <body className={`antialiased relative`}>
-        <div className="flex gap-x-2.5 items-center absolute top-0 right-0 p-4">
-          <Suspense fallback={null}>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  variant="ghost"
-                  className="relative h-8 w-8 rounded-full"
-                >
-                  <Avatar className="h-8 w-8 cursor-pointer">
-                    <AvatarImage src="/admin-avatar.png" alt="Admin" />
-                    <AvatarFallback>WT</AvatarFallback>
-                  </Avatar>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent className="w-56" align="end" forceMount>
-                <DropdownMenuItem onClick={handleLogout}>
-                  <span>Logout</span>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </Suspense>
-        </div>
-        {children}
-      </body>
+      <body className={`antialiased relative`}>{children}</body>
     </html>
   );
 }
