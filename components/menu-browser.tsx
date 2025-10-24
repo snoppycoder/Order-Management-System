@@ -31,60 +31,6 @@ interface frappeMenu extends MenuItem {
   valuation_rate: number;
 }
 
-// const MENU_ITEMS: MenuItem[] = [
-//   {
-//     id: "1",
-//     name: "Grilled Fish Curry",
-//     category: "Main Course",
-//     price: 320,
-//     image: "/grilled-fish.webp",
-//   },
-//   {
-//     id: "2",
-//     name: "Tandoori Chicken",
-//     category: "Main Course",
-//     price: 280,
-//     image: "/tandoori.jfif",
-//   },
-//   {
-//     id: "3",
-//     name: "Butter Chicken",
-//     category: "Main Course",
-//     price: 300,
-//     image: "/butter-chicken.jpg",
-//   },
-//   {
-//     id: "4",
-//     name: "Paneer Tikka",
-//     category: "Appetizers",
-//     price: 220,
-//   },
-//   {
-//     id: "5",
-//     name: "Samosa",
-//     category: "Appetizers",
-//     price: 80,
-//   },
-//   {
-//     id: "6",
-//     name: "Biryani",
-//     category: "Rice Dishes",
-//     price: 250,
-//   },
-//   {
-//     id: "7",
-//     name: "Coca Cola",
-//     category: "Beverages",
-//     price: 60,
-//   },
-//   {
-//     id: "8",
-//     name: "Mango Lassi",
-//     category: "Beverages",
-//     price: 100,
-//   },
-// ];
-
 const CATEGORIES = [
   "All Items",
   "Main Course",
@@ -191,9 +137,15 @@ export function MenuBrowser({ onAddItem }: MenuBrowserProps) {
           >
             <div className="aspect-square bg-gray-200 overflow-hidden">
               <img
-                src={item.image || "/butter-chicken.jpg"}
-                alt={item.name}
-                className="w-full h-full object-center"
+                src={
+                  item.image
+                    ? item.image.startsWith("/files/")
+                      ? `https://ruelux.k.erpnext.com${item.image}`
+                      : item.image
+                    : "/butter-chicken.jpg"
+                }
+                alt={item.item_name}
+                className="w-full h-full object-cover"
               />
             </div>
             <div className="p-3">

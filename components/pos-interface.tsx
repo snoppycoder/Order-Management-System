@@ -8,7 +8,7 @@ import { Toaster, toast } from "sonner";
 import { MenuBrowser } from "./menu-browser";
 import { OrderSummary } from "./order-summary";
 import { OrdersView } from "./order-view";
-import { menuAPI, authAPI } from "@/lib/api";
+import { menuAPI, authAPI, orderAPI } from "@/lib/api";
 
 interface POSInterfaceProps {
   user: { name: string; role: string } | null;
@@ -32,6 +32,13 @@ export function POSInterface({ user, onLogout }: POSInterfaceProps) {
   const [selectedTable, setSelectedTable] = useState<string>("1");
   const [cartItems, setCartItems] = useState<posItem[]>([]);
   const [customerName, setCustomerName] = useState("");
+  useEffect(() => {
+    const fetchOrder = async () => {
+      const data = await orderAPI.listOrder();
+      console.log(data);
+    };
+    fetchOrder();
+  }, []);
 
   const rooms = [
     { id: "VIP-1", tables: 10 },

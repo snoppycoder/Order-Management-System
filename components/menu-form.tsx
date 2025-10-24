@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { X, Upload } from "lucide-react";
 import { MenuItem } from "./menu-browser";
 import { menuAPI } from "@/lib/api";
+import { toast, Toaster } from "sonner";
 
 interface MenuItemFormProps {
   item: MenuItem | null;
@@ -25,6 +26,7 @@ export function MenuItemForm({ item, onSave, onClose }: MenuItemFormProps) {
     available: item?.available ?? true,
     image: item?.image || "",
   });
+  const [imageFile, setImageFile] = useState<File | null>(null);
 
   const [imagePreview, setImagePreview] = useState<string | undefined>(
     item?.image
@@ -42,11 +44,11 @@ export function MenuItemForm({ item, onSave, onClose }: MenuItemFormProps) {
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
+      setImageFile(file);
+
       const reader = new FileReader();
       reader.onloadend = () => {
-        const result = reader.result as string;
-        setImagePreview(result);
-        setFormData((prev) => ({ ...prev, image: result }));
+        setImagePreview(reader.result as string);
       };
       reader.readAsDataURL(file);
     }
@@ -54,25 +56,39 @@ export function MenuItemForm({ item, onSave, onClose }: MenuItemFormProps) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    menuAPI.addMenuItems({
-      item_name: formData.name,
-      item_code: formData.name,
-      item_group: formData.category,
-      description: formData.description,
-      stock_uom: "Nos",
-      standard_rate: parseFloat(formData.price),
-    });
-    const numericPrice = parseFloat(formData.price) || 0;
+    toast.loading("Processing your request")
+    try {
+      let uploadedImageUrl: string | undefined = undefined;
 
-    if (item) {
-      onSave({ ...item, ...formData, valuation_rate: numericPrice });
-    } else {
-      onSave({ ...formData, valuation_rate: numericPrice });
+      if (imageFile) {
+        uploadedImageUrl = await menuAPI.uploadFile(imageFile);
+      }
+      await menuAPI.addMenuItems({
+        item_name: formData.name,
+        item_code: formData.name,
+        item_group: formData.category,
+        description: formData.description,
+        stock_uom: "Nos",
+        valuation_rate: parseFloat(formData.price),
+        image: uploadedImageUrl ?? undefined,
+      });
+      const numericPrice = parseFloat(formData.price) || 0;
+
+      if (item) {
+        onSave({ ...item, ...formData, valuation_rate: numericPrice });
+      } else {
+        onSave({ ...formData, valuation_rate: numericPrice });
+      }
+      toast.success("Menu item added");
+    } catch (error) {
+      console.log(error);
+      toast.error("Failed to add menu item");
     }
   };
 
   return (
     <Card className="w-full max-w-xl  border border-border bg-card p-4">
+      <Toaster position="top-right" />
       <div className="mb-3 flex items-center justify-between">
         <h2 className="text-xl font-bold text-foreground">
           {item ? "Edit Menu Item" : "Add New Menu Item"}

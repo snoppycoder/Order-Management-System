@@ -1,11 +1,12 @@
+/// <reference types="node" />
 import axios from "axios";
 import qs from "qs";
 
 const api = axios.create({
-  baseURL:
-    process.env.NODE_ENV === "development"
-      ? "/api/proxy"
-      : "https://ruelux.k.erpnext.com/api",
+  baseURL: "/api/proxy",
+  // process.env.NODE_ENV === "development"
+  //   ? "/api/proxy"
+  //   : "https://ruelux.k.erpnext.com/api",
   withCredentials: true,
 });
 
@@ -85,13 +86,32 @@ export const authAPI = {
 };
 
 export const menuAPI = {
+  // @ts-ignore
+
+  uploadFile: async (file: File): Promise<string> => {
+    const formData = new FormData();
+    if (file.size == 0) throw Error("Can not upload an empty file");
+    const renamedFile = new File(
+      [file],
+      file.name.replace(/\.jfif$/i, ".jpg"),
+      {
+        type: "image/jpeg",
+      }
+    );
+    formData.append("file", renamedFile, file.name);
+    console.log(renamedFile);
+    const response = await api.post("/method/upload_file", formData);
+
+    return response.data.message.file_url;
+  },
   addMenuItems: async (body: {
     item_code: string;
     item_name: string;
     item_group: string;
     description: string;
     stock_uom: "Nos";
-    standard_rate: number;
+    valuation_rate: number;
+    image?: string;
   }) => {
     const response = await api.post("/resource/Item", body);
     return response.data;
@@ -103,6 +123,17 @@ export const menuAPI = {
 
     return response.data;
   },
+};
+export const orderAPI = {
+  listOrder: async () => {
+    const response = await api.get(`/resource/Sales Order?fields=["items"] `);
+
+    return response.data;
+  },
+
+  // createOrder: async (body :{
+
+  // })
 };
 
 export default api;

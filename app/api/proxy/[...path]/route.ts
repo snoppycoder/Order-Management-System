@@ -114,10 +114,7 @@ async function handleRequest(
 
     // Add CORS headers
 
-    responseHeaders.set(
-      "Access-Control-Allow-Origin",
-      "https://order-management-system-psi.vercel.app"
-    );
+    responseHeaders.set("Access-Control-Allow-Origin", "http://localhost:3000");
     responseHeaders.set("Vary", "Origin");
     responseHeaders.set(
       "Access-Control-Allow-Methods",
@@ -155,8 +152,7 @@ export async function OPTIONS() {
   return new NextResponse(null, {
     status: 200,
     headers: {
-      "Access-Control-Allow-Origin":
-        "https://order-management-system-psi.vercel.app",
+      "Access-Control-Allow-Origin": "http://localhost:3000",
       "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
       "Access-Control-Allow-Headers": "Content-Type, Authorization, Cookie",
       "Access-Control-Allow-Credentials": "true",
