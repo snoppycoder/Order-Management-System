@@ -133,7 +133,6 @@ export function OrderSummary({
         )}
       </div>
 
-      {/* Totals */}
       <div className="border-t border-gray-200 pt-3 space-y-2 text-sm">
         <div className="flex justify-between text-gray-600">
           <span>Subtotal</span>
@@ -152,7 +151,7 @@ export function OrderSummary({
       {/* Submit Button */}
       <Button
         onClick={onSubmitOrder}
-        className="w-full mt-4 bg-primary hover:bg-primary/90 text-white font-semibold py-2"
+        className="w-full mt-4 bg-primary cursor-pointer hover:bg-primary/90 text-white font-semibold py-2"
       >
         Submit Order
       </Button>

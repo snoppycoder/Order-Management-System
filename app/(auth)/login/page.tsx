@@ -26,7 +26,8 @@ export default function LoginPage() {
       // });
       const value = await authAPI.login(username, password);
 
-      if (value.message == "Logged In") {
+      if (value.response.message == "Logged In") {
+        console.log(value.role, "role");
         router.replace("/");
       }
     }

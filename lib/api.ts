@@ -55,6 +55,7 @@ api.interceptors.response.use(
 
 export const authAPI = {
   login: async (usr: string, pwd: string) => {
+    let res;
     try {
       const response = await api.post(
         "/method/login",
@@ -64,7 +65,23 @@ export const authAPI = {
         }
       );
       console.log("Login Response Data:", response.data);
-      return response.data;
+      if (response.status === 200) {
+        try {
+          const username = response.data.name; // This is the newly created user's name/email
+
+          const roleResponse = await api.get(
+            `/resource/User?filters=[["full_name","=","${username}"]]&fields=["full_name","roles"]`
+          );
+          res = roleResponse;
+          console.log(res, "result");
+          const userRoles = roleResponse.data.data[0]?.roles || [];
+        } catch (error) {
+          console.error("Error fetching user roles:", error);
+        }
+      }
+      const responseData = { response: response.data, role: res };
+      console.log(responseData);
+      return responseData;
     } catch (error) {
       console.error("Login failed:", error);
       throw error;
@@ -122,16 +139,41 @@ export const menuAPI = {
     return response.data;
   },
 };
-export const orderAPI = {
-  listOrder: async () => {
-    const response = await api.get(`/resource/Sales Order?fields=["items"] `);
 
+export const orderAPI = {
+  // listOrder: async () => {
+  //   const response = await api.get(`/resource/Sales Order?fields=["items"] `);
+
+  //   return response.data;
+  // },
+
+  createOrder: async (body: {
+    customer: string;
+    waiter: string;
+    item_code: string;
+    qty: number;
+    amount: number;
+    rate: number;
+    deliver_date: string;
+  }) => {
+    const formattedBody = {
+      customer: body.customer,
+      transaction_date: new Date().toISOString().split("T")[0],
+      delivery_date: body.deliver_date,
+      items: [
+        {
+          item_code: body.item_code,
+          qty: body.qty,
+          rate: body.rate ?? 0,
+          warehouse: "Finished Goods - RLRD",
+        },
+      ],
+      custom_waiter: body.waiter,
+    };
+    console.log(formattedBody, "data to  be sent");
+    const response = await api.post("/resource/Sales Order", formattedBody);
     return response.data;
   },
-
-  // createOrder: async (body :{
-
-  // })
 };
 
 export default api;

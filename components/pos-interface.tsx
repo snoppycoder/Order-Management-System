@@ -34,8 +34,8 @@ export function POSInterface({ user, onLogout }: POSInterfaceProps) {
   const [customerName, setCustomerName] = useState("");
   useEffect(() => {
     const fetchOrder = async () => {
-      const data = await orderAPI.listOrder();
-      console.log(data);
+      // // const data = await orderAPI.listOrder();
+      // console.log(data);
     };
     fetchOrder();
   }, []);
@@ -84,21 +84,40 @@ export function POSInterface({ user, onLogout }: POSInterfaceProps) {
     }
   };
 
-  const handleSubmitOrder = () => {
+  const handleSubmitOrder = async () => {
     if (cartItems.length === 0) {
       toast.error("Please add items to the order");
       return;
     }
+    try {
+      await Promise.all(
+        cartItems.map((item) =>
+          orderAPI.createOrder({
+            customer: customerName || "Aderaw",
+            waiter: user?.name ?? "zena@gmail.com",
+            item_code: item.name,
+            qty: item.quantity,
+            rate: item.valuation_rate,
+            amount: item.quantity * item.valuation_rate,
+            deliver_date: new Date().toISOString().split("T")[0],
+          })
+        )
+      );
+      toast.success("Order submitted successfully!");
+      setActiveTab("orders");
 
-    setCartItems([]);
-    setCustomerName("");
-    toast.success("Order submitted successfully!");
-
-    setActiveTab("orders");
-
-    setTimeout(() => {
-      document.getElementById("order")?.scrollIntoView({ behavior: "smooth" });
-    }, 100);
+      setTimeout(() => {
+        document
+          .getElementById("order")
+          ?.scrollIntoView({ behavior: "smooth" });
+      }, 100);
+    } catch (error) {
+      console.log(error);
+      toast.error("Encountered an error submitting the order");
+    } finally {
+      setCartItems([]);
+      setCustomerName("");
+    }
   };
 
   return (
@@ -106,7 +125,6 @@ export function POSInterface({ user, onLogout }: POSInterfaceProps) {
       <Toaster position="top-right" richColors />
 
       <main className="max-w-7xl mx-auto px-4 py-6">
-        {/* Tabs */}
         <div className="flex gap-2 mb-6">
           <Button
             onClick={() => setActiveTab("order")}
