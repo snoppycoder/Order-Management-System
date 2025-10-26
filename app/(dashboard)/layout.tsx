@@ -40,6 +40,7 @@ export default function DashboardLayout({
         else {
           if (!localStorage.getItem("role")) {
             const user = await authAPI.whoAmI(session.message);
+            localStorage.setItem("email", session.message);
             const roles = user.data.roles;
 
             for (const item of roles) {
@@ -51,7 +52,6 @@ export default function DashboardLayout({
             if (localStorage.getItem("role") == "Admin") {
               router.replace("/admin");
             } else {
-             
               router.replace("/");
             }
           }

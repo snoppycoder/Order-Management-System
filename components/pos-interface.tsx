@@ -48,7 +48,8 @@ export function POSInterface({ user, onLogout }: POSInterfaceProps) {
 
   const handleAddItem = (item: Item) => {
     setCartItems((prev) => {
-      const existingItem = prev.find((i) => i.id === item.id);
+      console.log(item, "adding");
+      const existingItem = prev.find((i) => i.name === item.name);
 
       if (existingItem) {
         // If the modal passes a quantity, add that amount instead of just +1

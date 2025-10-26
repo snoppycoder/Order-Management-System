@@ -24,6 +24,7 @@ interface Order {
   timestamp: string;
   workflow_state: string;
   custom_order_status: string;
+  modified_by: string;
 }
 
 export function OrdersView() {
@@ -66,6 +67,9 @@ export function OrdersView() {
   if (!orders) return <>Loading orders...</>;
 
   // if (!orders) return <>Loading orders...</>;
+  const myOrder = orders.filter(
+    (order) => order.modified_by === localStorage.getItem("email")
+  );
   const filteredOrders = orders.filter(
     (order) => order.workflow_state === selectedTab
   );

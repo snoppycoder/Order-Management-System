@@ -51,6 +51,7 @@ export function MenuBrowser({ onAddItem }: MenuBrowserProps) {
     const fetchMenu = async () => {
       const response = await menuAPI.getMenuItems();
       const items = Array.isArray(response) ? response : response?.data || [];
+      console.log(items, "menu items");
 
       setMenu(items);
     };
