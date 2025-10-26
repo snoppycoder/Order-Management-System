@@ -25,14 +25,36 @@ export default function DashboardLayout({
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [user, setUser] = useState<{ name: string; role: string } | null>(null);
   const [loading, setLoading] = useState(true);
+  const systemRoles = ["Waiter", "Cashier", "Chef", "Admin"];
   useEffect(() => {
     const fetchSession = async () => {
       try {
         const session = await authAPI.session();
-        console.log(session);
+
         if (!session.message) {
           router.replace("/login");
-        } else {
+        }
+        // else {
+        //   setLoading(false);
+        // }
+        else {
+          if (!localStorage.getItem("role")) {
+            const user = await authAPI.whoAmI(session.message);
+            const roles = user.data.roles;
+
+            for (const item of roles) {
+              if (systemRoles.includes(item.role)) {
+                localStorage.setItem("role", item.role);
+                break;
+              }
+            }
+            if (localStorage.getItem("role") == "Admin") {
+              router.replace("/admin");
+            } else {
+             
+              router.replace("/");
+            }
+          }
           setLoading(false);
         }
       } catch (error) {
@@ -44,7 +66,8 @@ export default function DashboardLayout({
   }, []);
 
   const handleLogout = async () => {
-    const res = await authAPI.logout();
+    await authAPI.logout();
+    localStorage.clear();
     router.replace("/login");
 
     setIsLoggedIn(false);

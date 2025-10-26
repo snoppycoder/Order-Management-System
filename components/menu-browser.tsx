@@ -51,17 +51,11 @@ export function MenuBrowser({ onAddItem }: MenuBrowserProps) {
     const fetchMenu = async () => {
       const response = await menuAPI.getMenuItems();
       const items = Array.isArray(response) ? response : response?.data || [];
-      console.log(items);
+
       setMenu(items);
     };
     fetchMenu();
   }, []);
-
-  useEffect(() => {
-    if (debouncedQuery) {
-      //api calls with debouncedQuery
-    }
-  }, [debouncedQuery]);
 
   const filteredItems = menu.filter((item) => {
     const matchesCategory =

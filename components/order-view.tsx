@@ -1,70 +1,81 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Printer, CreditCard } from "lucide-react";
 
 import { Toaster, toast } from "sonner";
+import { orderAPI } from "@/lib/api";
+import { useRouter } from "next/navigation";
 export interface Item {
   name: string;
   quantity: number;
   price: number;
 }
 interface Order {
-  id: string;
+  name: string;
   room: string;
   table: string;
-  customerName: string;
+  customer: string;
   items: Item[];
   total: number;
   status: "Unbilled" | "Draft" | "Paid";
   timestamp: string;
+  workflow_state: string;
+  custom_order_status: string;
 }
 
-const MOCK_ORDERS: Order[] = [
-  {
-    id: "ORD001",
-    room: "VIP-1",
-    table: "5",
-    customerName: "John Doe",
-    items: [
-      { name: "Butter Chicken", quantity: 2, price: 300 },
-      { name: "Biryani", quantity: 1, price: 250 },
-    ],
-    total: 850,
-    status: "Unbilled",
-    timestamp: "2024-10-20 14:30",
-  },
-  {
-    id: "ORD002",
-    room: "Standard",
-    table: "12",
-    customerName: "Jane Smith",
-    items: [
-      { name: "Tandoori Chicken", quantity: 1, price: 280 },
-      { name: "Mango Lassi", quantity: 2, price: 100 },
-    ],
-    total: 480,
-    status: "Draft",
-    timestamp: "2024-10-20 14:15",
-  },
-];
-
 export function OrdersView() {
-  const [orders, setOrders] = useState<Order[]>(MOCK_ORDERS);
-  const [selectedTab, setSelectedTab] = useState<"Unbilled" | "Draft" | "Paid">(
-    "Unbilled"
-  );
+  const [orders, setOrders] = useState<Order[]>();
+  const currRole = localStorage.getItem("role");
 
-  const filteredOrders = orders.filter((order) => order.status === selectedTab);
+  const [viableTab, setViableTab] = useState<string[]>([]);
+  // if role is waiter
+
+  const waiterTab = ["New", "In Progress", "Served"];
+  const cashierTab = ["Unbilled", "Draft", "Paid"];
+
+  // let currRole = null
+
+  // const [selectedTab, setSelectedTab] = useState<"New" | "In Progress" | "Served"|  >("New");
+
+  // the cashier
+
+  const [selectedTab, setSelectedTab] = useState<string>();
+  useEffect(() => {
+    if (currRole == "Waiter") {
+      setViableTab(waiterTab);
+      setSelectedTab(waiterTab[0]);
+    } else {
+      setViableTab(cashierTab);
+      setSelectedTab(cashierTab[0]);
+    }
+  }, [currRole]);
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => {
+    setMounted(true);
+    const fetchOrder = async () => {
+      const res = await orderAPI.listOrder();
+      console.log("order", res);
+      setOrders(Array.isArray(res) ? res : res.data || []);
+    };
+    fetchOrder();
+  }, []);
+  if (!mounted) return null;
+  if (!orders) return <>Loading orders...</>;
+
+  // if (!orders) return <>Loading orders...</>;
+  const filteredOrders = orders.filter(
+    (order) => order.workflow_state === selectedTab
+  );
 
   const handlePrint = (orderId: string) => {
     toast.loading(`Printing KOT and receipt for order ${orderId}`);
     // Update status to Draft after printing
     setOrders(
       orders.map((order) =>
-        order.id === orderId ? { ...order, status: "Draft" } : order
+        order.name === orderId ? { ...order, status: "Draft" } : order
       )
     );
     console.log(orders);
@@ -73,7 +84,7 @@ export function OrdersView() {
   const handlePayment = (orderId: string) => {
     toast.success(`Processing payment for order ${orderId}`);
     // Update status to Paid
-    setOrders(orders.filter((order) => order.id !== orderId));
+    setOrders(orders.filter((order) => order.name !== orderId));
   };
 
   return (
@@ -81,7 +92,7 @@ export function OrdersView() {
       {/* Tabs */}
       <Toaster position="top-right" richColors />
       <div className="flex gap-2">
-        {(["Unbilled", "Draft", "Paid"] as const).map((tab) => (
+        {viableTab.map((tab) => (
           <button
             key={tab}
             onClick={() => setSelectedTab(tab)}
@@ -101,30 +112,32 @@ export function OrdersView() {
         {filteredOrders.length === 0 ? (
           <Card className="p-8 text-center">
             <p className="text-gray-500">
-              No {selectedTab.toLowerCase()} orders
+              No {selectedTab!.toLowerCase()} orders
             </p>
           </Card>
         ) : (
           filteredOrders.map((order) => (
-            <Card key={order.id} className="p-4">
+            <Card key={order.name} className="p-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {/* Order Details */}
                 <div>
                   <div className="flex items-center justify-between mb-2">
-                    <h3 className="font-semibold text-gray-900">{order.id}</h3>
+                    <h3 className="font-semibold text-gray-900">
+                      {order.name}
+                    </h3>
                     <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded">
-                      {order.status}
+                      {order.custom_order_status}
                     </span>
                   </div>
                   <p className="text-sm text-gray-600">
-                    <strong>Room:</strong> {order.room} |{" "}
-                    <strong>Table:</strong> {order.table}
+                    <strong>Room:</strong> {order?.room} |{" "}
+                    <strong>Table:</strong> {order?.table} |{" "}
                   </p>
                   <p className="text-sm text-gray-600">
-                    <strong>Customer:</strong> {order.customerName || "N/A"}
+                    <strong>Customer:</strong> {order.customer || "N/A"}
                   </p>
                   <p className="text-sm text-gray-600">
-                    <strong>Time:</strong> {order.timestamp}
+                    <strong>Time:</strong> {order?.timestamp}
                   </p>
                 </div>
 
@@ -135,12 +148,12 @@ export function OrdersView() {
                       Items:
                     </p>
                     <ul className="text-sm text-gray-600 space-y-1">
-                      {order.items.map((item, idx) => (
+                      {/* {order.items.map((item, idx) => (
                         <li key={idx}>
                           {item.quantity}x {item.name} -
                           {item.price * item.quantity} Birr
                         </li>
-                      ))}
+                      ))} */}
                     </ul>
                   </div>
                   <div className="flex items-center justify-between">
@@ -150,7 +163,7 @@ export function OrdersView() {
                     <div className="flex gap-2">
                       {order.status === "Unbilled" && (
                         <Button
-                          onClick={() => handlePrint(order.id)}
+                          onClick={() => handlePrint(order.name)}
                           size="sm"
                           className="bg-green-600 hover:bg-green-700 text-white"
                         >
@@ -160,7 +173,7 @@ export function OrdersView() {
                       )}
                       {order.status === "Draft" && (
                         <Button
-                          onClick={() => handlePayment(order.id)}
+                          onClick={() => handlePayment(order.name)}
                           size="sm"
                           className="bg-primary hover:bg-primary/90 text-white"
                         >

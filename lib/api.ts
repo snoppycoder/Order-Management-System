@@ -64,24 +64,8 @@ export const authAPI = {
           headers: { "Content-Type": "application/x-www-form-urlencoded" },
         }
       );
-      console.log("Login Response Data:", response.data);
-      if (response.status === 200) {
-        try {
-          const username = response.data.name; // This is the newly created user's name/email
-
-          const roleResponse = await api.get(
-            `/resource/User?filters=[["full_name","=","${username}"]]&fields=["full_name","roles"]`
-          );
-          res = roleResponse;
-          console.log(res, "result");
-          const userRoles = roleResponse.data.data[0]?.roles || [];
-        } catch (error) {
-          console.error("Error fetching user roles:", error);
-        }
-      }
-      const responseData = { response: response.data, role: res };
-      console.log(responseData);
-      return responseData;
+    
+      return response.data;
     } catch (error) {
       console.error("Login failed:", error);
       throw error;
@@ -90,6 +74,12 @@ export const authAPI = {
 
   logout: async () => {
     const response = await api.post("/method/logout");
+    return response.data;
+  },
+  whoAmI: async (email: string) => {
+    const response = await api.get(
+      `/resource/User/${email}?fields=["name", "roles"]`
+    );
     return response.data;
   },
   session: async () => {
@@ -141,11 +131,14 @@ export const menuAPI = {
 };
 
 export const orderAPI = {
-  // listOrder: async () => {
-  //   const response = await api.get(`/resource/Sales Order?fields=["items"] `);
+  listOrder: async () => {
+    // const response = await api.get(
+    //   `/resource/Sales Order?fields=["name", "customer", "status"]`
+    // );
+    const response = await api.get(`/resource/Sales Order?fields=["*"]`);
 
-  //   return response.data;
-  // },
+    return response.data;
+  },
 
   createOrder: async (body: {
     customer: string;

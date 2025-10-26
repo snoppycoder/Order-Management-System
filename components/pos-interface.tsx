@@ -32,14 +32,12 @@ export function POSInterface({ user, onLogout }: POSInterfaceProps) {
   const [selectedTable, setSelectedTable] = useState<string>("1");
   const [cartItems, setCartItems] = useState<posItem[]>([]);
   const [customerName, setCustomerName] = useState("");
+  const role = localStorage.getItem("role");
   useEffect(() => {
-    const fetchOrder = async () => {
-      // // const data = await orderAPI.listOrder();
-      // console.log(data);
-    };
-    fetchOrder();
-  }, []);
-
+    if (role == "Cashier") {
+      setActiveTab("orders");
+    }
+  }, [role]);
   const rooms = [
     { id: "VIP-1", tables: 10 },
     { id: "VIP-2", tables: 10 },
@@ -126,16 +124,20 @@ export function POSInterface({ user, onLogout }: POSInterfaceProps) {
 
       <main className="max-w-7xl mx-auto px-4 py-6">
         <div className="flex gap-2 mb-6">
-          <Button
-            onClick={() => setActiveTab("order")}
-            className={`px-6 py-2 rounded-lg font-medium transition-colors ${
-              activeTab === "order"
-                ? "bg-primary text-white"
-                : "bg-white text-gray-700 border border-gray-300 hover:bg-gray-50"
-            }`}
-          >
-            New Order
-          </Button>
+          {role !== "Cashier" ? (
+            <Button
+              onClick={() => setActiveTab("order")}
+              className={`px-6 py-2 rounded-lg font-medium transition-colors ${
+                activeTab === "order"
+                  ? "bg-primary text-white"
+                  : "bg-white text-gray-700 border border-gray-300 hover:bg-gray-50"
+              }`}
+            >
+              New Order
+            </Button>
+          ) : (
+            <></>
+          )}
           <Button
             onClick={() => setActiveTab("orders")}
             className={`px-6 py-2 rounded-lg font-medium transition-colors ${
