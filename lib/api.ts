@@ -186,5 +186,16 @@ export const orderAPI = {
     return response.data;
   },
 };
+export const approvalWorkflow = {
+  update: async (status: string, name: string) => {
+    try {
+      api.put(`/resource/Sales Order/${name}`, {
+        workflow_state: status,
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  },
+};
 
 export default api;

@@ -46,6 +46,8 @@ export function MenuBrowser({ onAddItem }: MenuBrowserProps) {
   const [selectedProduct, setSelectedProduct] = useState<MenuItem | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [menu, setMenu] = useState<frappeMenu[]>([]);
+  const currRole = localStorage.getItem("role");
+
   useEffect(() => {
     const fetchMenu = async () => {
       const response = await menuAPI.getMenuItems();

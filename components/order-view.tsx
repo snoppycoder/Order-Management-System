@@ -3,10 +3,17 @@
 import { Suspense, useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Printer, CreditCard } from "lucide-react";
+import {
+  Printer,
+  CreditCard,
+  DollarSign,
+  Loader,
+  HandPlatter,
+  BookCheck,
+} from "lucide-react";
 
 import { Toaster, toast } from "sonner";
-import { orderAPI } from "@/lib/api";
+import { approvalWorkflow, orderAPI } from "@/lib/api";
 
 export interface Item {
   name: string;
@@ -20,11 +27,12 @@ interface Order {
   customer: string;
   items: Item[];
   total: number;
-  status: "Unbilled" | "Draft" | "Paid";
+  status: "Billed" | "Cancelled" | "Paid";
   timestamp: string;
   workflow_state: string;
   custom_order_status: string;
-  modified_by: string;
+
+  owner: string;
 }
 
 export function OrdersView() {
@@ -34,16 +42,10 @@ export function OrdersView() {
   const [viableTab, setViableTab] = useState<string[]>([]);
   // if role is waiter
   let filteredOrders: Order[];
-  const waiterTab = ["New", "In Progress", "Served"];
-  const cashierTab = ["Billed", "Paid", "Cancelled"];
-  const adminTab = [
-    "New",
-    "In Progress",
-    "Served",
-    "Unbilled",
-    "Draft",
-    "Paid",
-  ];
+  const waiterTab = ["New", "Ready", "Served"];
+  const chefTab = ["New", "In progress"];
+  const cashierTab = ["Served", "Billed", "Paid", "Cancelled"];
+  const adminTab = ["New", "In Progress", "Ready", "Served", "Billed", "Paid"];
 
   const [selectedTab, setSelectedTab] = useState<string>();
   useEffect(() => {
@@ -53,18 +55,31 @@ export function OrdersView() {
     } else if (currRole == "Admin") {
       setViableTab(adminTab);
       setSelectedTab(adminTab[0]);
+    } else if (currRole == "Chef") {
+      setViableTab(chefTab);
+      setSelectedTab(chefTab[0]);
     } else {
       setViableTab(cashierTab);
       setSelectedTab(cashierTab[0]);
     }
   }, [currRole]);
   const [mounted, setMounted] = useState(false);
+
   useEffect(() => {
     setMounted(true);
+    // const fetchOrder = async () => {
+    //   const res = await orderAPI.listOrder();
+    //   setOrders(Array.isArray(res) ? res : res.data || []);
+    //   console.log(res);
+    // };
     const fetchOrder = async () => {
-      const res = await orderAPI.listOrder();
-      setOrders(Array.isArray(res) ? res : res.data || []);
-      console.log(res);
+      try {
+        const res = await orderAPI.listOrder();
+        setOrders(Array.isArray(res) ? res : res.data || []);
+      } catch (error) {
+        console.error("Failed to fetch orders:", error);
+        toast.error("Failed to load orders");
+      }
     };
 
     fetchOrder();
@@ -76,7 +91,7 @@ export function OrdersView() {
   if (currRole?.toLowerCase() == "Waiter".toLowerCase()) {
     const myOrder = orders.filter(
       (order) =>
-        order.modified_by.toLowerCase() ===
+        order.owner.toLowerCase() ===
         localStorage.getItem("email")?.toLowerCase()
     );
     filteredOrders = myOrder.filter(
@@ -88,28 +103,41 @@ export function OrdersView() {
     );
   }
 
-  const handlePrint = (orderId: string) => {
-    toast.loading(`Printing KOT and receipt for order ${orderId}`);
-    // Update status to Draft after printing
-    setOrders(
-      orders.map((order) =>
-        order.name === orderId ? { ...order, status: "Draft" } : order
-      )
-    );
-    console.log(orders);
-  };
+  // const handlePrint = (orderId: string) => {
+  //   toast.loading(`Printing KOT and receipt for order ${orderId}`);
+  //   // Update status to Draft after printing
+  //   setOrders(
+  //     orders.map((order) =>
+  //       order.name === orderId ? { ...order, status: "Billed" } : order
+  //     )
+  //   );
+  //   console.log(orders);
+  // };
 
-  const handlePayment = (orderId: string) => {
-    toast.success(`Processing payment for order ${orderId}`);
+  const handleUpdate = async (orderId: string, status: string) => {
+    try {
+      setOrders((prev) =>
+        prev?.map((order) =>
+          order.name === orderId ? { ...order, workflow_state: status } : order
+        )
+      );
+      await approvalWorkflow.update(status, orderId);
+      toast.success(`Processing your request for order: ${orderId}`);
+      // await fetchOrder();
+
+      // setOrders(orders.filter((order) => order.name !== orderId));
+    } catch (error) {
+      console.log(error);
+      toast.error("Error updating status");
+    }
     // Update status to Paid
-    setOrders(orders.filter((order) => order.name !== orderId));
   };
 
   return (
     <div className="space-y-4" id="order">
       {/* Tabs */}
       <Toaster position="top-right" richColors />
-      <div className="flex gap-2">
+      <div className="flex gap-2 ">
         {viableTab.map((tab) => (
           <button
             key={tab}
@@ -125,7 +153,6 @@ export function OrdersView() {
         ))}
       </div>
 
-      {/* Orders List */}
       <div className="space-y-3">
         {filteredOrders.length === 0 ? (
           <Card className="p-8 text-center">
@@ -135,7 +162,7 @@ export function OrdersView() {
           </Card>
         ) : (
           filteredOrders.map((order) => (
-            <Card key={order.name} className="p-4">
+            <Card key={order.name} className="relative p-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {/* Order Details */}
                 <div>
@@ -143,9 +170,9 @@ export function OrdersView() {
                     <h3 className="font-semibold text-gray-900">
                       {order.name}
                     </h3>
-                    <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded">
+                    {/* <span className="absolute lg:right-2 lg:mb-2 lg:top-2 text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded">
                       {order.custom_order_status}
-                    </span>
+                    </span> */}
                   </div>
                   <p className="text-sm text-gray-600">
                     <strong>Room:</strong> {order?.room} |{" "}
@@ -159,7 +186,6 @@ export function OrdersView() {
                   </p>
                 </div>
 
-                {/* Items & Total */}
                 <div>
                   <div className="mb-3">
                     <p className="text-sm font-medium text-gray-900 mb-1">
@@ -172,24 +198,58 @@ export function OrdersView() {
                       {order.total} Birr
                     </span>
                     <div className="flex gap-2">
-                      {order.status === "Unbilled" && (
+                      {order.workflow_state === "Billed" && (
                         <Button
-                          onClick={() => handlePrint(order.name)}
+                          onClick={() => handleUpdate(order.name, "Paid")}
                           size="sm"
-                          className="bg-green-600 hover:bg-green-700 text-white"
+                          className="bg-primary hover:bg-primary/90 text-white cursor-pointer"
                         >
-                          <Printer className="w-4 h-4 mr-1" />
-                          Print
+                          <DollarSign className="w-4 h-4 mr-1" />
+                          Pay
                         </Button>
                       )}
-                      {order.status === "Draft" && (
+                      {order.workflow_state === "New" &&
+                        (currRole == "Chef" || "Admin") && (
+                          <Button
+                            onClick={() =>
+                              handleUpdate(order.name, "In Progress")
+                            }
+                            size="sm"
+                            className="bg-primary hover:bg-primary/90 text-white cursor-pointer"
+                          >
+                            <Loader className="w-4 h-4 mr-1" />
+                            In Progress
+                          </Button>
+                        )}
+                      {order.workflow_state === "Ready" && (
                         <Button
-                          onClick={() => handlePayment(order.name)}
+                          onClick={() => handleUpdate(order.name, "Served")}
                           size="sm"
-                          className="bg-primary hover:bg-primary/90 text-white"
+                          className="bg-primary hover:bg-primary/90 text-white cursor-pointer"
                         >
-                          <CreditCard className="w-4 h-4 mr-1" />
-                          Pay
+                          <HandPlatter className="w-4 h-4 mr-1" />
+                          Served
+                        </Button>
+                      )}
+
+                      {order.workflow_state === "In Progress" && (
+                        <Button
+                          onClick={() => handleUpdate(order.name, "Ready")}
+                          size="sm"
+                          className="bg-primary hover:bg-primary/90 text-white cursor-pointer"
+                        >
+                          <BookCheck className="w-4 h-4 mr-1" />
+                          Ready
+                        </Button>
+                      )}
+                      {order.workflow_state === "Served" && (
+                        <Button
+                          onClick={() => handleUpdate(order.name, "Billed")}
+                          size="sm"
+                          className="bg-primary hover:bg-primary/90 text-white cursor-pointer"
+                        >
+                          <DollarSign className="w-4 h-4 mr-1" />
+                          Bill
                         </Button>
                       )}
                     </div>
