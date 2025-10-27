@@ -8,7 +8,7 @@ import { useDebounce } from "@/hooks/useDebouce";
 import { ProductModal } from "./product-modal";
 import { OrderItem } from "./order-summary";
 import { menuAPI } from "@/lib/api";
-import { CACHE_KEY, CACHE_TTL } from "@/utils/constant";
+import { MENU_CACHE_KEY, CACHE_TTL } from "@/utils/constant";
 
 export interface MenuItem {
   id: string;
@@ -51,7 +51,7 @@ export function MenuBrowser({ onAddItem }: MenuBrowserProps) {
   const currRole = localStorage.getItem("role");
 
   useEffect(() => {
-    const cached = localStorage.getItem(CACHE_KEY);
+    const cached = localStorage.getItem(MENU_CACHE_KEY);
     if (cached) {
       const { items, timestamp } = JSON.parse(cached);
       if (Date.now() - timestamp < CACHE_TTL) {
@@ -65,7 +65,7 @@ export function MenuBrowser({ onAddItem }: MenuBrowserProps) {
       const items = Array.isArray(response) ? response : response?.data || [];
 
       localStorage.setItem(
-        CACHE_KEY,
+        MENU_CACHE_KEY,
         JSON.stringify({ items, timestamp: Date.now() })
       );
       setMenu(items);

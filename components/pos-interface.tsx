@@ -19,7 +19,7 @@ export interface posItem {
   name: string;
   price_list_rate: number;
   quantity: number;
-  custom_special_instruction?:string;
+  custom_special_instruction?: string;
 }
 export interface submittableOrder {
   customer: string;
@@ -27,14 +27,12 @@ export interface submittableOrder {
   delivery_date: string;
   transaction_date: string;
   items: posItem[];
-  
-  
 }
 interface Item {
   id: string;
   name: string;
   price_list_rate: number;
-  
+
   quantity?: number; // since we are going from menu order which has no quantity to an order object which does have quantity
 }
 export function POSInterface({ user, onLogout }: POSInterfaceProps) {
@@ -45,7 +43,7 @@ export function POSInterface({ user, onLogout }: POSInterfaceProps) {
   const [customerName, setCustomerName] = useState("");
   const role = localStorage.getItem("role");
   useEffect(() => {
-    if (role == "Cashier") {
+    if (role == "Cashier" || "Chef") {
       setActiveTab("orders");
     }
   }, [role]);
@@ -131,7 +129,7 @@ export function POSInterface({ user, onLogout }: POSInterfaceProps) {
 
       <main className="max-w-7xl mx-auto px-4 py-6">
         <div className="flex gap-2 mb-6">
-          {role !== "Cashier" ? (
+          {role !== "Cashier" || "Chef" ? (
             <Button
               onClick={() => setActiveTab("order")}
               className={`px-6 py-2 rounded-lg font-medium transition-colors ${
