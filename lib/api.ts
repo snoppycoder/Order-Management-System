@@ -123,11 +123,21 @@ export const menuAPI = {
     const response = await api.post("/resource/Item", body);
     return response.data;
   },
+  getInfoMenu: async (menu_id: string) => {
+    try {
+      const response = await api.get(
+        `/resource/Item Add-on?filters=[["linked_item","=",${menu_id}]]`
+      );
+      return response.data;
+    } catch (error) {
+      console.log(error);
+    }
+  },
   getMenuItems: async () => {
     // Fetch items and prices
     const [itemsRes, pricesRes] = await Promise.all([
       api.get(`/resource/Item?fields=["*"]`),
-      // api.get("/resource/Item?filter=["parent" = "order_name"]?field["*"])
+
       api.get(`/resource/Item Price?fields=["*"]`),
     ]);
 
@@ -154,7 +164,12 @@ export const orderAPI = {
   listOrder: async () => {
     // const response = await api.get(
     //   `/resource/Sales Order?fields=["name", "customer", "status"]`
+    // )
+    // const extr = await api.get(
+    //   `/resource/Sales Order Item?filters=[["parent","=","${order_name}"]]&fields=["*"]`
     // );
+
+    // console.log("order extra", extr.data);
     const response = await api.get(
       `/resource/Sales Order?fields=["*"]&order_by=creation desc`
     );
@@ -164,7 +179,7 @@ export const orderAPI = {
 
   createOrder: async (body: submittableOrder) => {
     const items: posItem[] = body.items;
-    const reconItem = items.map((item, _) => {
+    const reconItems = items.map((item, _) => {
       const { quantity, ...rest } = item;
       return {
         ...rest,
@@ -178,7 +193,7 @@ export const orderAPI = {
       customer: body.customer,
       transaction_date: new Date().toISOString().split("T")[0],
       delivery_date: body.delivery_date,
-      items: reconItem,
+      items: reconItems,
       custom_waiter: body.waiter,
     };
     console.log(formattedBody, "data to  be sent");

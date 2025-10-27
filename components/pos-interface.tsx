@@ -19,6 +19,7 @@ export interface posItem {
   name: string;
   price_list_rate: number;
   quantity: number;
+  custom_special_instruction?:string;
 }
 export interface submittableOrder {
   customer: string;
@@ -26,11 +27,14 @@ export interface submittableOrder {
   delivery_date: string;
   transaction_date: string;
   items: posItem[];
+  
+  
 }
 interface Item {
   id: string;
   name: string;
   price_list_rate: number;
+  
   quantity?: number; // since we are going from menu order which has no quantity to an order object which does have quantity
 }
 export function POSInterface({ user, onLogout }: POSInterfaceProps) {

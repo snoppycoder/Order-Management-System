@@ -12,7 +12,7 @@ export interface OrderItem {
 
   variant?: string;
   quantity: number;
-  specialInstructions?: string;
+  custom_special_instruction?: string;
 }
 
 interface OrderSummaryProps {
@@ -89,9 +89,9 @@ export function OrderSummary({
                         +{item.addOns.join(", ")}
                       </p>
                     )}
-                    {item.specialInstructions && (
+                    {item.custom_special_instruction && (
                       <p className="text-xs text-blue-600 italic mt-1">
-                        Note: {item.specialInstructions}
+                        Note: {item.custom_special_instruction}
                       </p>
                     )}
                   </div>

@@ -1,10 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { X, Plus, Minus } from "lucide-react";
 import { MenuItem } from "./menu-browser";
+import { menuAPI } from "@/lib/api";
 
 interface ProductModalProps {
   item: MenuItem | null;
@@ -43,6 +44,7 @@ export function ProductModal({
   const [selectedVariant, setSelectedVariant] = useState("Medium");
   const [selectedAddOns, setSelectedAddOns] = useState<string[]>([]);
 
+
   if (!isOpen || !item) return null;
 
   const variantPrice =
@@ -64,6 +66,7 @@ export function ProductModal({
 
   const handleAddToOrder = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
+
     onAddToOrder(
       item,
       quantity,
@@ -77,7 +80,6 @@ export function ProductModal({
     setSelectedAddOns([]);
     onClose();
   };
-  console.log(item.price_list_rate);
 
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm bg-opacity-50 flex items-center justify-center z-50 p-4">

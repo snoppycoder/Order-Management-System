@@ -12,6 +12,7 @@ import { menuAPI } from "@/lib/api";
 export interface MenuItem {
   id: string;
   name: string;
+  item_code?: string;
   category: string;
   price_list_rate: number;
   image?: string | "/butter-chicken.jpg";
@@ -68,21 +69,22 @@ export function MenuBrowser({ onAddItem }: MenuBrowserProps) {
     return matchesCategory && matchesSearch;
   });
   const handleProductClick = (item: MenuItem) => {
-    console.log(item.id);
+    
+
     setSelectedProduct(item);
     setIsModalOpen(true);
   };
   const handleAddFromModal = (
     item: MenuItem,
     quantity: number,
-    specialInstructions: string,
+    custom_special_instruction: string,
     selectedVariant: string,
     addOns: string[]
   ) => {
     const existingItem = {
       ...item,
       quantity,
-      specialInstructions,
+      custom_special_instruction,
       variant: selectedVariant,
       addOns,
     };
