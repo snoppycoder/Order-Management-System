@@ -131,7 +131,7 @@ export function POSInterface({ user, onLogout }: POSInterfaceProps) {
 
       <main className="max-w-7xl mx-auto px-4 py-6">
         <div className="flex gap-2 mb-6">
-          {role === "Cashier" || role === "Chef" ? (
+          {role !== "Cashier" && role !== "Chef" && (
             <Button
               onClick={() => setActiveTab("order")}
               className={`px-6 py-2 rounded-lg font-medium transition-colors ${
@@ -142,9 +142,8 @@ export function POSInterface({ user, onLogout }: POSInterfaceProps) {
             >
               New Order
             </Button>
-          ) : (
-            <></>
           )}
+
           <Button
             onClick={() => setActiveTab("orders")}
             className={`px-6 py-2 rounded-lg font-medium transition-colors ${
