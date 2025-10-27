@@ -135,7 +135,7 @@ export function MenuItemForm({ item, onSave, onClose }: MenuItemFormProps) {
             </label>
             <Input
               type="text"
-              placeholder="Margherita Pizza"
+              placeholder="eg: Margherita Pizza"
               value={formData.name}
               onChange={(e) =>
                 setFormData((prev) => ({ ...prev, name: e.target.value }))
