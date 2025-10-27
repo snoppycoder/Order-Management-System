@@ -1,11 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { X, Plus, Minus } from "lucide-react";
 import { MenuItem } from "./menu-browser";
-import { menuAPI } from "@/lib/api";
 
 interface ProductModalProps {
   item: MenuItem | null;

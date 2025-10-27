@@ -8,6 +8,7 @@ import { useDebounce } from "@/hooks/useDebouce";
 import { ProductModal } from "./product-modal";
 import { OrderItem } from "./order-summary";
 import { menuAPI } from "@/lib/api";
+import { CACHE_KEY, CACHE_TTL } from "@/utils/constant";
 
 export interface MenuItem {
   id: string;
@@ -50,11 +51,23 @@ export function MenuBrowser({ onAddItem }: MenuBrowserProps) {
   const currRole = localStorage.getItem("role");
 
   useEffect(() => {
+    const cached = localStorage.getItem(CACHE_KEY);
+    if (cached) {
+      const { items, timestamp } = JSON.parse(cached);
+      if (Date.now() - timestamp < CACHE_TTL) {
+        setMenu(items);
+
+        return;
+      }
+    }
     const fetchMenu = async () => {
       const response = await menuAPI.getMenuItems();
       const items = Array.isArray(response) ? response : response?.data || [];
-      console.log(items, "menu items");
 
+      localStorage.setItem(
+        CACHE_KEY,
+        JSON.stringify({ items, timestamp: Date.now() })
+      );
       setMenu(items);
     };
     fetchMenu();
@@ -69,8 +82,6 @@ export function MenuBrowser({ onAddItem }: MenuBrowserProps) {
     return matchesCategory && matchesSearch;
   });
   const handleProductClick = (item: MenuItem) => {
-    
-
     setSelectedProduct(item);
     setIsModalOpen(true);
   };
