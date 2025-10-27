@@ -14,24 +14,7 @@ interface MenuManagementInterfaceProps {
 }
 
 export default function MenuManagement({ user }: MenuManagementInterfaceProps) {
-  const [menuItems, setMenuItems] = useState<MenuItem[]>([
-    {
-      id: "1",
-      name: "Margherita Pizza",
-      category: "Pizza",
-      valuation_rate: 299,
-      available: true,
-      description: "Classic pizza with tomato, mozzarella, and basil",
-    },
-    {
-      id: "2",
-      name: "Butter Chicken",
-      category: "Main Course",
-      valuation_rate: 349,
-      available: true,
-      description: "Tender chicken in creamy tomato sauce",
-    },
-  ]);
+  const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
 
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
@@ -194,7 +177,7 @@ export default function MenuManagement({ user }: MenuManagementInterfaceProps) {
 
                 <div className="mb-4 flex items-center justify-between">
                   <span className="text-lg font-bold text-primary">
-                    {item.valuation_rate} Birr
+                    {item.price_list_rate} Birr
                   </span>
                 </div>
 
