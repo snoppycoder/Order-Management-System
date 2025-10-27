@@ -47,7 +47,7 @@ export function ProductModal({
 
   const variantPrice =
     VARIANTS.find((v) => v.name === selectedVariant)?.price ||
-    item.valuation_rate;
+    item.price_list_rate;
   const addOnsTotal = selectedAddOns.reduce((sum, addOnName) => {
     const addOn = ADD_ONS.find((a) => a.name === addOnName);
     return sum + (addOn?.price || 0);
@@ -77,6 +77,7 @@ export function ProductModal({
     setSelectedAddOns([]);
     onClose();
   };
+  console.log(item.price_list_rate);
 
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm bg-opacity-50 flex items-center justify-center z-50 p-4">
@@ -85,16 +86,26 @@ export function ProductModal({
           onClick={onClose}
           className="absolute top-2 right-2 bg-white rounded-full hover:bg-gray-100 z-10"
         >
-          <X className="w-5 h-5 text-gray-700" />
+          <X className="w-5 h-5 text-gray-700 cursor-pointer" />
         </button>
         <div className="flex flex-col lg:flex-row gap-2 lg:gap-6 px-4 lg:p-6">
           <div className="relative shrink-0 w-full sm:w-80">
             <div className="aspect-square hidden md:block bg-gray-200 rounded-lg overflow-hidden">
-              <img
-                src={item.image || "/placeholder.svg"}
-                alt={item.name}
-                className="w-full h-full object-cover"
-              />
+              {item.image ? (
+                <img
+                  src={
+                    item.image
+                      ? item.image.startsWith("/files/")
+                        ? `https://ruelux.k.erpnext.com${item.image}`
+                        : item.image
+                      : "/butter-chicken.jpg"
+                  }
+                  alt={item.name}
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <></>
+              )}
             </div>
           </div>
 

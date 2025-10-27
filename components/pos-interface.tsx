@@ -14,16 +14,23 @@ interface POSInterfaceProps {
   user: { name: string; role: string } | null;
   onLogout: () => void;
 }
-interface posItem {
+export interface posItem {
   id: string;
   name: string;
-  valuation_rate: number;
+  price_list_rate: number;
   quantity: number;
+}
+export interface submittableOrder {
+  customer: string;
+  waiter: string;
+  delivery_date: string;
+  transaction_date: string;
+  items: posItem[];
 }
 interface Item {
   id: string;
   name: string;
-  valuation_rate: number;
+  price_list_rate: number;
   quantity?: number; // since we are going from menu order which has no quantity to an order object which does have quantity
 }
 export function POSInterface({ user, onLogout }: POSInterfaceProps) {
@@ -88,20 +95,15 @@ export function POSInterface({ user, onLogout }: POSInterfaceProps) {
       toast.error("Please add items to the order");
       return;
     }
+    const orderObj: submittableOrder = {
+      customer: customerName || "Aderaw", // if the customer is not in the db add later on
+      waiter: localStorage.getItem("email") || "zena@gmail.com",
+      delivery_date: new Date().toISOString().split("T")[0],
+      transaction_date: new Date().toISOString().split("T")[0],
+      items: cartItems,
+    };
     try {
-      await Promise.all(
-        cartItems.map((item) =>
-          orderAPI.createOrder({
-            customer: customerName || "Aderaw",
-            waiter: user?.name ?? "zena@gmail.com",
-            item_code: item.name,
-            qty: item.quantity,
-            rate: item.valuation_rate,
-            amount: item.quantity * item.valuation_rate,
-            deliver_date: new Date().toISOString().split("T")[0],
-          })
-        )
-      );
+      await orderAPI.createOrder(orderObj);
       toast.success("Order submitted successfully!");
       setActiveTab("orders");
 

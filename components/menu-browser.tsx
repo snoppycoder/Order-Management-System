@@ -13,7 +13,7 @@ export interface MenuItem {
   id: string;
   name: string;
   category: string;
-  valuation_rate: number;
+  price_list_rate: number;
   image?: string | "/butter-chicken.jpg";
   available?: boolean | true;
   description?: string;
@@ -27,8 +27,8 @@ interface frappeMenu extends MenuItem {
   item_name: string;
   item_group: string;
   description: string;
+
   stock_uom: "Nos";
-  valuation_rate: number;
 }
 
 const CATEGORIES = [
@@ -43,7 +43,6 @@ const CATEGORIES = [
 export function MenuBrowser({ onAddItem }: MenuBrowserProps) {
   const [selectedCategory, setSelectedCategory] = useState("All Items");
   const [searchTerm, setSearchTerm] = useState("");
-  const debouncedQuery = useDebounce(searchTerm, 400);
   const [selectedProduct, setSelectedProduct] = useState<MenuItem | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [menu, setMenu] = useState<frappeMenu[]>([]);
@@ -67,6 +66,7 @@ export function MenuBrowser({ onAddItem }: MenuBrowserProps) {
     return matchesCategory && matchesSearch;
   });
   const handleProductClick = (item: MenuItem) => {
+    console.log(item.id);
     setSelectedProduct(item);
     setIsModalOpen(true);
   };
@@ -150,7 +150,7 @@ export function MenuBrowser({ onAddItem }: MenuBrowserProps) {
               <p className="text-xs text-gray-500 mb-2">{item.item_group}</p>
               <div className="flex items-center justify-between">
                 <span className="text-lg font-bold text-primary">
-                  {item.valuation_rate} Birr
+                  {item.price_list_rate} Birr
                 </span>
                 <Button
                   onClick={(e) => {

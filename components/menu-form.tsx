@@ -21,7 +21,7 @@ export function MenuItemForm({ item, onSave, onClose }: MenuItemFormProps) {
   const [formData, setFormData] = useState({
     name: item?.name || "",
     category: item?.category || "Pizza",
-    price: item?.valuation_rate ? String(item.valuation_rate) : "",
+    price: item?.price_list_rate ? String(item.price_list_rate) : "",
     description: item?.description || "",
     available: item?.available ?? true,
     image: item?.image || "",
@@ -56,7 +56,7 @@ export function MenuItemForm({ item, onSave, onClose }: MenuItemFormProps) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    toast.loading("Processing your request")
+    toast.loading("Processing your request");
     try {
       let uploadedImageUrl: string | undefined = undefined;
 
@@ -69,15 +69,15 @@ export function MenuItemForm({ item, onSave, onClose }: MenuItemFormProps) {
         item_group: formData.category,
         description: formData.description,
         stock_uom: "Nos",
-        valuation_rate: parseFloat(formData.price),
+        price_list_rate: parseFloat(formData.price),
         image: uploadedImageUrl ?? undefined,
       });
       const numericPrice = parseFloat(formData.price) || 0;
 
       if (item) {
-        onSave({ ...item, ...formData, valuation_rate: numericPrice });
+        onSave({ ...item, ...formData, price_list_rate: numericPrice });
       } else {
-        onSave({ ...formData, valuation_rate: numericPrice });
+        onSave({ ...formData, price_list_rate: numericPrice });
       }
       toast.success("Menu item added");
     } catch (error) {

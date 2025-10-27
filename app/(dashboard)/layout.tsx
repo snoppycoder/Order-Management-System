@@ -40,19 +40,20 @@ export default function DashboardLayout({
         else {
           if (!localStorage.getItem("role")) {
             const user = await authAPI.whoAmI(session.message);
+            console.log(session.message, "email");
             localStorage.setItem("email", session.message);
             const roles = user.data.roles;
-
-            for (const item of roles) {
-              if (systemRoles.includes(item.role)) {
-                localStorage.setItem("role", item.role);
-                break;
-              }
-            }
-            if (localStorage.getItem("role") == "Admin") {
-              router.replace("/admin");
-            } else {
+            if (roles.length > 40) {
+              localStorage.setItem("role", "Admin");
+              // router.replace("/admin");
               router.replace("/");
+            } else {
+              for (const item of roles) {
+                if (systemRoles.includes(item.role)) {
+                  localStorage.setItem("role", item.role);
+                  break;
+                }
+              }
             }
           }
           setLoading(false);

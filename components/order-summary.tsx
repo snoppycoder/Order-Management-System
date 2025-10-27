@@ -8,7 +8,8 @@ export interface OrderItem {
   id: string;
   name: string;
   addOns?: string[];
-  valuation_rate: number;
+  price_list_rate: number;
+
   variant?: string;
   quantity: number;
   specialInstructions?: string;
@@ -28,7 +29,7 @@ export function OrderSummary({
   onSubmitOrder,
 }: OrderSummaryProps) {
   const calculateItemPrice = (item: OrderItem) => {
-    let price = item.valuation_rate;
+    let price = item.price_list_rate;
 
     // Add variant price if different from base price
     if (item.variant === "Small") price = 249;
@@ -51,12 +52,12 @@ export function OrderSummary({
     return price;
   };
   const subtotal = items.reduce(
-    (sum, item) => sum + item.valuation_rate * item.quantity,
+    (sum, item) => sum + item.price_list_rate * item.quantity,
     0
   );
   const tax = Math.round(subtotal * 0.05);
   const total = subtotal + tax;
-  console.log("Order Summary Items:", items);
+
   return (
     <Card className="p-4 sticky top-6">
       <h3 className="font-semibold text-gray-900 mb-4">Order Summary</h3>

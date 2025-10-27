@@ -1,13 +1,13 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Printer, CreditCard } from "lucide-react";
 
 import { Toaster, toast } from "sonner";
 import { orderAPI } from "@/lib/api";
-import { useRouter } from "next/navigation";
+
 export interface Item {
   name: string;
   quantity: number;
@@ -33,21 +33,26 @@ export function OrdersView() {
 
   const [viableTab, setViableTab] = useState<string[]>([]);
   // if role is waiter
-
+  let filteredOrders: Order[];
   const waiterTab = ["New", "In Progress", "Served"];
-  const cashierTab = ["Unbilled", "Draft", "Paid"];
-
-  // let currRole = null
-
-  // const [selectedTab, setSelectedTab] = useState<"New" | "In Progress" | "Served"|  >("New");
-
-  // the cashier
+  const cashierTab = ["Billed", "Paid", "Cancelled"];
+  const adminTab = [
+    "New",
+    "In Progress",
+    "Served",
+    "Unbilled",
+    "Draft",
+    "Paid",
+  ];
 
   const [selectedTab, setSelectedTab] = useState<string>();
   useEffect(() => {
     if (currRole == "Waiter") {
       setViableTab(waiterTab);
       setSelectedTab(waiterTab[0]);
+    } else if (currRole == "Admin") {
+      setViableTab(adminTab);
+      setSelectedTab(adminTab[0]);
     } else {
       setViableTab(cashierTab);
       setSelectedTab(cashierTab[0]);
@@ -58,21 +63,30 @@ export function OrdersView() {
     setMounted(true);
     const fetchOrder = async () => {
       const res = await orderAPI.listOrder();
-      console.log("order", res);
       setOrders(Array.isArray(res) ? res : res.data || []);
+      console.log(res);
     };
+
     fetchOrder();
   }, []);
   if (!mounted) return null;
   if (!orders) return <>Loading orders...</>;
 
   // if (!orders) return <>Loading orders...</>;
-  const myOrder = orders.filter(
-    (order) => order.modified_by === localStorage.getItem("email")
-  );
-  const filteredOrders = orders.filter(
-    (order) => order.workflow_state === selectedTab
-  );
+  if (currRole?.toLowerCase() == "Waiter".toLowerCase()) {
+    const myOrder = orders.filter(
+      (order) =>
+        order.modified_by.toLowerCase() ===
+        localStorage.getItem("email")?.toLowerCase()
+    );
+    filteredOrders = myOrder.filter(
+      (order) => order.workflow_state === selectedTab
+    );
+  } else {
+    filteredOrders = orders.filter(
+      (order) => order.workflow_state === selectedTab
+    );
+  }
 
   const handlePrint = (orderId: string) => {
     toast.loading(`Printing KOT and receipt for order ${orderId}`);
@@ -151,14 +165,7 @@ export function OrdersView() {
                     <p className="text-sm font-medium text-gray-900 mb-1">
                       Items:
                     </p>
-                    <ul className="text-sm text-gray-600 space-y-1">
-                      {/* {order.items.map((item, idx) => (
-                        <li key={idx}>
-                          {item.quantity}x {item.name} -
-                          {item.price * item.quantity} Birr
-                        </li>
-                      ))} */}
-                    </ul>
+                    <ul className="text-sm text-gray-600 space-y-1"></ul>
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="font-bold text-lg text-gray-900">

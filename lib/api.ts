@@ -1,4 +1,6 @@
 /// <reference types="node" />
+import { Item } from "@/components/order-view";
+import { posItem, submittableOrder } from "@/components/pos-interface";
 import axios from "axios";
 import qs from "qs";
 
@@ -64,7 +66,7 @@ export const authAPI = {
           headers: { "Content-Type": "application/x-www-form-urlencoded" },
         }
       );
-    
+
       return response.data;
     } catch (error) {
       console.error("Login failed:", error);
@@ -115,18 +117,36 @@ export const menuAPI = {
     item_group: string;
     description: string;
     stock_uom: "Nos";
-    valuation_rate: number;
+    price_list_rate: number;
     image?: string;
   }) => {
     const response = await api.post("/resource/Item", body);
     return response.data;
   },
   getMenuItems: async () => {
-    const response = await api.get(
-      `/resource/Item?fields=["name","item_name","image","description","valuation_rate","item_group","stock_uom"]`
-    );
+    // Fetch items and prices
+    const [itemsRes, pricesRes] = await Promise.all([
+      api.get(`/resource/Item?fields=["*"]`),
+      // api.get("/resource/Item?filter=["parent" = "order_name"]?field["*"])
+      api.get(`/resource/Item Price?fields=["*"]`),
+    ]);
 
-    return response.data;
+    const items = itemsRes.data.data; // all items
+    const prices = pricesRes.data.data; // all item prices
+
+    // Merge them
+    const itemsWithPrices = items.map((item: posItem) => {
+      const priceEntry = prices.find(
+        (p: { item_code: string }) => p.item_code === item.name
+      ); // or item.item_code depending on your field
+      return {
+        ...item,
+        price_list_rate: priceEntry ? priceEntry.price_list_rate : null,
+        price_list: priceEntry ? priceEntry.price_list : null,
+      };
+    });
+
+    return itemsWithPrices;
   },
 };
 
@@ -135,32 +155,30 @@ export const orderAPI = {
     // const response = await api.get(
     //   `/resource/Sales Order?fields=["name", "customer", "status"]`
     // );
-    const response = await api.get(`/resource/Sales Order?fields=["*"]`);
+    const response = await api.get(
+      `/resource/Sales Order?fields=["*"]&order_by=creation desc`
+    );
 
     return response.data;
   },
 
-  createOrder: async (body: {
-    customer: string;
-    waiter: string;
-    item_code: string;
-    qty: number;
-    amount: number;
-    rate: number;
-    deliver_date: string;
-  }) => {
+  createOrder: async (body: submittableOrder) => {
+    const items: posItem[] = body.items;
+    let reconItem = items.map((item, _) => {
+      const { quantity, ...rest } = item;
+      return {
+        ...rest,
+        qty: quantity,
+        item_code: item.name,
+        warehouse: "Finished Goods - RLRD",
+      };
+    });
+
     const formattedBody = {
       customer: body.customer,
       transaction_date: new Date().toISOString().split("T")[0],
-      delivery_date: body.deliver_date,
-      items: [
-        {
-          item_code: body.item_code,
-          qty: body.qty,
-          rate: body.rate ?? 0,
-          warehouse: "Finished Goods - RLRD",
-        },
-      ],
+      delivery_date: body.delivery_date,
+      items: reconItem,
       custom_waiter: body.waiter,
     };
     console.log(formattedBody, "data to  be sent");
