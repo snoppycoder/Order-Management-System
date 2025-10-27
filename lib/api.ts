@@ -164,7 +164,7 @@ export const orderAPI = {
 
   createOrder: async (body: submittableOrder) => {
     const items: posItem[] = body.items;
-    let reconItem = items.map((item, _) => {
+    const reconItem = items.map((item, _) => {
       const { quantity, ...rest } = item;
       return {
         ...rest,
