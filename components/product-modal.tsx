@@ -20,12 +20,6 @@ interface ProductModalProps {
   ) => void;
 }
 
-const VARIANTS = [
-  { name: "Small", price: 249 },
-  { name: "Medium", price: 299 },
-  { name: "Large", price: 399 },
-];
-
 const ADD_ONS = [
   { name: "Cheese", price: 29 },
   { name: "Extra Toppings", price: 49 },
@@ -44,8 +38,12 @@ export function ProductModal({
   const [selectedVariant, setSelectedVariant] = useState("Medium");
   const [selectedAddOns, setSelectedAddOns] = useState<string[]>([]);
 
-
   if (!isOpen || !item) return null;
+  const VARIANTS = [
+    { name: "Small", price: item.price_list_rate - item.price_list_rate * 0.5 },
+    { name: "Medium", price: item.price_list_rate },
+    { name: "Large", price: item.price_list_rate + item.price_list_rate * 0.5 },
+  ]; // just a workaround
 
   const variantPrice =
     VARIANTS.find((v) => v.name === selectedVariant)?.price ||
@@ -54,7 +52,7 @@ export function ProductModal({
     const addOn = ADD_ONS.find((a) => a.name === addOnName);
     return sum + (addOn?.price || 0);
   }, 0);
-  const itemTotal = (variantPrice + addOnsTotal) * quantity;
+  const itemTotal = addOnsTotal + (variantPrice ?? 0 * quantity);
 
   const handleAddOnToggle = (addOnName: string) => {
     setSelectedAddOns((prev) =>
