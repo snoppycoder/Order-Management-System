@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Toaster, toast } from "sonner";
 
-import { MenuBrowser } from "./menu-browser";
+import { AddOn, MenuBrowser } from "./menu-browser";
 import { OrderSummary } from "./order-summary";
 import { OrdersView } from "./order-view";
 import { menuAPI, authAPI, orderAPI } from "@/lib/api";
@@ -20,6 +20,8 @@ export interface posItem {
   price_list_rate: number;
   quantity: number;
   custom_special_instruction?: string;
+  itemAddOn?: AddOn[];
+  addOns?: string[];
 }
 export interface submittableOrder {
   customer: string;
@@ -27,6 +29,8 @@ export interface submittableOrder {
   delivery_date: string;
   transaction_date: string;
   items: posItem[];
+  custom_table_number: string;
+  custom_room: string;
 }
 interface Item {
   id: string;
@@ -57,22 +61,46 @@ export function POSInterface({ user, onLogout }: POSInterfaceProps) {
 
   const currentRoom = rooms.find((r) => r.id === selectedRoom);
 
-  const handleAddItem = (item: Item) => {
+  const handleAddItem = (item: posItem) => {
+    // setCartItems((prev) => {
+    //   const existingItem = prev.find((i) => i.name === item.name);
+
+    //   if (existingItem) {
+    //     // If the modal passes a quantity, add that amount instead of just +1
+    //     return prev.map((i) =>
+    //       i.id === item.id
+    //         ? { ...i, quantity: i.quantity + (item.quantity || 1) }
+    //         : i
+    //     );
+    //   }
     setCartItems((prev) => {
-      console.log(item, "adding");
       const existingItem = prev.find((i) => i.name === item.name);
 
       if (existingItem) {
-        // If the modal passes a quantity, add that amount instead of just +1
         return prev.map((i) =>
           i.id === item.id
-            ? { ...i, quantity: i.quantity + (item.quantity || 1) }
+            ? {
+                ...i,
+                quantity: i.quantity + (item.quantity || 1),
+                itemAddOn: item.itemAddOn || i.itemAddOn,
+                addOns: item.addOns || i.addOns,
+              }
             : i
         );
       }
 
-      // Use the quantity from the modal or default to 1
-      return [...prev, { ...item, quantity: item.quantity || 1 }];
+      // Use the quantity from the modal or default to 1, and provide required posItem fields
+      return [
+        ...prev,
+        {
+          id: item.id,
+          name: item.name,
+          price_list_rate: item.price_list_rate,
+          quantity: item.quantity || 1,
+          itemAddOn: item.itemAddOn,
+          addOns: item.addOns,
+        },
+      ];
     });
   };
 
@@ -105,8 +133,11 @@ export function POSInterface({ user, onLogout }: POSInterfaceProps) {
       delivery_date: new Date().toISOString().split("T")[0],
       transaction_date: new Date().toISOString().split("T")[0],
       items: cartItems,
+      custom_table_number: selectedTable,
+      custom_room: selectedRoom,
     };
     try {
+      localStorage.setItem("items", JSON.stringify(cartItems));
       await orderAPI.createOrder(orderObj);
       toast.success("Order submitted successfully!");
       setActiveTab("orders");
@@ -207,7 +238,6 @@ export function POSInterface({ user, onLogout }: POSInterfaceProps) {
                 </div>
               </Card>
 
-              {/* Customer Name */}
               <Card className="p-4">
                 <h3 className="font-semibold text-gray-900 mb-3">
                   Customer Details

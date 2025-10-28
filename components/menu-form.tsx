@@ -77,7 +77,10 @@ export function MenuItemForm({ item, onSave, onClose }: MenuItemFormProps) {
       if (item) {
         onSave({ ...item, ...formData, price_list_rate: numericPrice });
       } else {
-        onSave({ ...formData, price_list_rate: numericPrice });
+        onSave({
+          ...formData, price_list_rate: numericPrice,
+          itemAddOn: []
+        });
       }
       toast.success("Menu item added");
     } catch (error) {

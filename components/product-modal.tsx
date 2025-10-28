@@ -19,12 +19,12 @@ interface ProductModalProps {
   ) => void;
 }
 
-const ADD_ONS = [
-  { name: "Cheese", price: 29 },
-  { name: "Extra Toppings", price: 49 },
-  { name: "Bacon", price: 59 },
-  { name: "Mushrooms", price: 39 },
-];
+// const ADD_ONS = [
+//   { name: "Cheese", price: 29 },
+//   { name: "Extra Toppings", price: 49 },
+//   { name: "Bacon", price: 59 },
+//   { name: "Mushrooms", price: 39 },
+// ];
 
 export function ProductModal({
   item,
@@ -36,6 +36,7 @@ export function ProductModal({
   const [specialInstructions, setSpecialInstructions] = useState("");
   const [selectedVariant, setSelectedVariant] = useState("Medium");
   const [selectedAddOns, setSelectedAddOns] = useState<string[]>([]);
+  const ADD_ONS = item?.itemAddOn;
 
   if (!isOpen || !item) return null;
   const VARIANTS = [
@@ -48,7 +49,7 @@ export function ProductModal({
     VARIANTS.find((v) => v.name === selectedVariant)?.price ||
     item.price_list_rate;
   const addOnsTotal = selectedAddOns.reduce((sum, addOnName) => {
-    const addOn = ADD_ONS.find((a) => a.name === addOnName);
+    const addOn = ADD_ONS?.find((a) => a.name === addOnName);
     return sum + (addOn?.price || 0);
   }, 0);
   const itemTotal = addOnsTotal + (variantPrice ?? 0 * quantity);
@@ -133,30 +134,36 @@ export function ProductModal({
               </div>
 
               <div className="lg:mb-2">
-                <h3 className="text-sm font-semibold text-gray-900 mb-2">
-                  Add-ons
-                </h3>
-                <div className="space-y-1 max-h-24 overflow-y-auto">
-                  {ADD_ONS.map((addOn) => (
-                    <label
-                      key={addOn.name}
-                      className="flex items-center gap-2 cursor-pointer"
-                    >
-                      <input
-                        type="checkbox"
-                        checked={selectedAddOns.includes(addOn.name)}
-                        onChange={() => handleAddOnToggle(addOn.name)}
-                        className="w-4 h-4 rounded border-gray-300"
-                      />
-                      <span className="text-sm text-gray-700">
-                        {addOn.name}
-                      </span>
-                      <span className="text-xs text-gray-500 ml-auto">
-                        + {addOn.price} Birr
-                      </span>
-                    </label>
-                  ))}
-                </div>
+                {ADD_ONS?.length !== 0 ? (
+                  <>
+                    <h3 className="text-sm font-semibold text-gray-900 mb-2">
+                      Add-ons
+                    </h3>
+                    <div className="space-y-1 max-h-24 overflow-y-auto">
+                      {ADD_ONS?.map((addOn) => (
+                        <label
+                          key={addOn.idx}
+                          className="flex items-center gap-2 cursor-pointer"
+                        >
+                          <input
+                            type="checkbox"
+                            checked={selectedAddOns.includes(addOn.name)}
+                            onChange={() => handleAddOnToggle(addOn.name)}
+                            className="w-4 h-4 rounded border-gray-300"
+                          />
+                          <span className="text-sm text-gray-700">
+                            {addOn.name}
+                          </span>
+                          <span className="text-xs text-gray-500 ml-auto">
+                            + {addOn.price} Birr
+                          </span>
+                        </label>
+                      ))}
+                    </div>
+                  </>
+                ) : (
+                  <></>
+                )}
               </div>
             </div>
 

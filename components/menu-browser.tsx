@@ -9,7 +9,12 @@ import { ProductModal } from "./product-modal";
 import { OrderItem } from "./order-summary";
 import { menuAPI } from "@/lib/api";
 import { MENU_CACHE_KEY, CACHE_TTL } from "@/utils/constant";
-
+import { posItem } from "./pos-interface";
+export interface AddOn {
+  price: number;
+  name: string;
+  idx: number;
+}
 export interface MenuItem {
   id: string;
   name: string;
@@ -19,17 +24,18 @@ export interface MenuItem {
   image?: string | "/butter-chicken.jpg";
   available?: boolean | true;
   description?: string;
+  itemAddOn: AddOn[];
 }
 
 interface MenuBrowserProps {
-  onAddItem: (item: MenuItem) => void;
+  onAddItem: (item: posItem) => void;
 }
 interface frappeMenu extends MenuItem {
   item_code: string;
   item_name: string;
   item_group: string;
   description: string;
-
+  quantity: number;
   stock_uom: "Nos";
 }
 
@@ -52,6 +58,7 @@ export function MenuBrowser({ onAddItem }: MenuBrowserProps) {
 
   useEffect(() => {
     const cached = localStorage.getItem(MENU_CACHE_KEY);
+
     if (cached) {
       const { items, timestamp } = JSON.parse(cached);
       if (Date.now() - timestamp < CACHE_TTL) {
@@ -63,7 +70,7 @@ export function MenuBrowser({ onAddItem }: MenuBrowserProps) {
     const fetchMenu = async () => {
       const response = await menuAPI.getMenuItems();
       const items = Array.isArray(response) ? response : response?.data || [];
-
+      console.log(items);
       localStorage.setItem(
         MENU_CACHE_KEY,
         JSON.stringify({ items, timestamp: Date.now() })

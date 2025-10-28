@@ -14,6 +14,7 @@ import {
 
 import { Toaster, toast } from "sonner";
 import { approvalWorkflow, orderAPI } from "@/lib/api";
+import { MenuItem } from "./menu-browser";
 
 export interface Item {
   name: string;
@@ -22,8 +23,8 @@ export interface Item {
 }
 interface Order {
   name: string;
-  room: string;
-  table: string;
+  custom_room: string;
+  custom_table_number: string;
   customer: string;
   items: Item[];
   total: number;
@@ -31,7 +32,7 @@ interface Order {
   timestamp: string;
   workflow_state: string;
   custom_order_status: string;
-
+  localItems: MenuItem[];
   owner: string;
 }
 
@@ -75,6 +76,7 @@ export function OrdersView() {
     const fetchOrder = async () => {
       try {
         const res = await orderAPI.listOrder();
+        console.log(res, "orders");
         setOrders(Array.isArray(res) ? res : res.data || []);
       } catch (error) {
         console.error("Failed to fetch orders:", error);
@@ -168,6 +170,7 @@ export function OrdersView() {
                 <div>
                   <div className="flex items-center justify-between mb-2">
                     <h3 className="font-semibold text-gray-900">
+                      {order.customer}
                       {order.name}
                     </h3>
                     {/* <span className="absolute lg:right-2 lg:mb-2 lg:top-2 text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded">
@@ -175,23 +178,30 @@ export function OrdersView() {
                     </span> */}
                   </div>
                   <p className="text-sm text-gray-600">
-                    <strong>Room:</strong> {order?.room} |{" "}
-                    <strong>Table:</strong> {order?.table} |{" "}
+                    <strong>Room:</strong> {order?.custom_room}
+                  </p>
+                  <p className="text-sm text-gray-600">
+                    <strong>Table:</strong> {order?.custom_table_number}
                   </p>
                   <p className="text-sm text-gray-600">
                     <strong>Customer:</strong> {order.customer || "N/A"}
                   </p>
-                  <p className="text-sm text-gray-600">
+                  {/* <p className="text-sm text-gray-600">
                     <strong>Time:</strong> {order?.timestamp}
-                  </p>
+                  </p> */}
                 </div>
 
                 <div>
                   <div className="mb-3">
-                    <p className="text-sm font-medium text-gray-900 mb-1">
+                    {/* <p className="text-sm font-medium text-gray-900 mb-1">
                       Items:
                     </p>
-                    <ul className="text-sm text-gray-600 space-y-1"></ul>
+                    <ul className="text-sm text-gray-600 space-y-1">
+                      {order &&
+                        order?.localItems?.map((order: MenuItem) => (
+                          <li>{order.name}</li>
+                        ))}
+                    </ul> */}
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="font-bold text-lg text-gray-900">

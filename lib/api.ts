@@ -1,5 +1,5 @@
 /// <reference types="node" />
-import { Item } from "@/components/order-view";
+
 import { posItem, submittableOrder } from "@/components/pos-interface";
 import axios from "axios";
 import qs from "qs";
@@ -135,22 +135,33 @@ export const menuAPI = {
   },
   getMenuItems: async () => {
     // Fetch items and prices
-    const [itemsRes, pricesRes] = await Promise.all([
+    const [itemsRes, pricesRes, addonRes] = await Promise.all([
       api.get(`/resource/Item?fields=["*"]`),
 
       api.get(`/resource/Item Price?fields=["*"]`),
+      api.get(`/resource/Item Add-on?fields=["*"]`),
     ]);
 
-    const items = itemsRes.data.data; // all items
-    const prices = pricesRes.data.data; // all item prices
+    const items = itemsRes.data.data;
+    const prices = pricesRes.data.data;
+    const addons = addonRes.data.data;
+    console.log(addons);
 
-    // Merge them
     const itemsWithPrices = items.map((item: posItem) => {
       const priceEntry = prices.find(
         (p: { item_code: string }) => p.item_code === item.name
       ); // or item.item_code depending on your field
+
+      const addOnsForItem = addons
+        .filter((a: { linked_item: string }) => a.linked_item === item.name)
+        .map((a: { price: number; add_on_name: string }) => ({
+          price: a.price,
+          name: a.add_on_name,
+        }));
+
       return {
         ...item,
+        itemAddOn: addOnsForItem,
         price_list_rate: priceEntry ? priceEntry.price_list_rate : null,
         price_list: priceEntry ? priceEntry.price_list : null,
       };
@@ -162,19 +173,22 @@ export const menuAPI = {
 
 export const orderAPI = {
   listOrder: async () => {
-    // const response = await api.get(
-    //   `/resource/Sales Order?fields=["name", "customer", "status"]`
-    // )
-    // const extr = await api.get(
-    //   `/resource/Sales Order Item?filters=[["parent","=","${order_name}"]]&fields=["*"]`
-    // );
-
-    // console.log("order extra", extr.data);
     const response = await api.get(
       `/resource/Sales Order?fields=["*"]&order_by=creation desc`
     );
 
-    return response.data;
+    const orders = response.data.data || [];
+    const localItems = JSON.parse(localStorage.getItem("items") || "[]");
+
+    // if (localItems.length > 0 && orders.length > 0) {
+    //   const name = orders[0].name;
+    //   await api.put(`/resource/Sales Order/${name}`, {
+    //     custom_local_items: localItems,
+    //   });
+    // }
+    // localStorage.removeItem("items");
+
+    return orders;
   },
 
   createOrder: async (body: submittableOrder) => {
@@ -195,6 +209,8 @@ export const orderAPI = {
       delivery_date: body.delivery_date,
       items: reconItems,
       custom_waiter: body.waiter,
+      custom_table_number: `Table-${body.custom_table_number}`,
+      custom_room: body.custom_room,
     };
     console.log(formattedBody, "data to  be sent");
     const response = await api.post("/resource/Sales Order", formattedBody);

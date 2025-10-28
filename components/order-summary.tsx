@@ -3,16 +3,17 @@
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Trash2, Plus, Minus } from "lucide-react";
+import { AddOn } from "./menu-browser";
 
 export interface OrderItem {
   id: string;
   name: string;
   addOns?: string[];
   price_list_rate: number;
-
   variant?: string;
   quantity: number;
   custom_special_instruction?: string;
+  itemAddOn?: AddOn[];
 }
 
 interface OrderSummaryProps {
@@ -28,35 +29,34 @@ export function OrderSummary({
   onUpdateQuantity,
   onSubmitOrder,
 }: OrderSummaryProps) {
+  console.log(items, "this is from pos-interface");
   const calculateItemPrice = (item: OrderItem) => {
-    let price = item.price_list_rate;
+    let price = item.price_list_rate ?? 0;
 
-    // Add variant price if different from base price
-    if (item.variant === "Small") price = 249;
-    else if (item.variant === "Medium") price = 299;
-    else if (item.variant === "Large") price = 399;
+    // if (item.variant === "Small") price = 249;
+    // else if (item.variant === "Medium") price = 299;
+    // else if (item.variant === "Large") price = 399;
+    console.log(items);
 
-    // Add add-ons prices
     if (item.addOns && item.addOns.length > 0) {
-      const addOnPrices: { [key: string]: number } = {
-        Cheese: 29,
-        "Extra Toppings": 49,
-        Bacon: 59,
-        Mushrooms: 39,
-      };
-      item.addOns.forEach((addOn) => {
-        price += addOnPrices[addOn] || 0;
+      const addOnPrices = item.itemAddOn!;
+
+      item.addOns.forEach((selectedAddOnName) => {
+        const addon = addOnPrices.find((a) => a.name === selectedAddOnName);
+        if (addon) {
+          price += addon.price;
+        }
       });
     }
 
     return price;
   };
-  const subtotal = items.reduce(
-    (sum, item) => sum + item.price_list_rate * item.quantity,
+  const total = items.reduce(
+    (sum, item) => sum + calculateItemPrice(item) * item.quantity,
     0
   );
-  const tax = Math.round(subtotal * 0.05);
-  const total = subtotal + tax;
+  // const tax = Math.round(subtotal * 0.05);
+  // const total = subtotal + tax;
 
   return (
     <Card className="p-4 sticky top-6">
@@ -89,6 +89,7 @@ export function OrderSummary({
                         +{item.addOns.join(", ")}
                       </p>
                     )}
+
                     {item.custom_special_instruction && (
                       <p className="text-xs text-blue-600 italic mt-1">
                         Note: {item.custom_special_instruction}
@@ -135,14 +136,14 @@ export function OrderSummary({
       </div>
 
       <div className="border-t border-gray-200 pt-3 space-y-2 text-sm">
-        <div className="flex justify-between text-gray-600">
+        {/* <div className="flex justify-between text-gray-600">
           <span>Subtotal</span>
           <span>{subtotal} Birr</span>
-        </div>
-        <div className="flex justify-between text-gray-600">
+        </div> */}
+        {/* <div className="flex justify-between text-gray-600">
           <span>Tax (5%)</span>
           <span>{tax} Birr</span>
-        </div>
+        </div> */}
         <div className="flex justify-between font-bold text-lg text-gray-900 bg-blue-50 p-2 rounded">
           <span>Total</span>
           <span className="text-primary">{total} Birr</span>
