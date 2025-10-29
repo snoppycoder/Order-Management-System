@@ -168,7 +168,7 @@ export function OrdersView() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {/* Order Details */}
                 <div>
-                  <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center justify-between">
                     <h3 className="font-semibold text-gray-900">
                       {order.customer}
                       {order.name}
@@ -205,7 +205,7 @@ export function OrdersView() {
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="font-bold text-lg text-gray-900">
-                      {order.total} Birr
+                      Total: {order.total} Birr
                     </span>
                     <div className="flex gap-2">
                       {order.workflow_state === "Billed" && (
@@ -219,13 +219,27 @@ export function OrdersView() {
                         </Button>
                       )}
                       {order.workflow_state === "New" &&
-                        (currRole == "Chef" || "Admin") && (
+                        (currRole === "Chef" || currRole === "Admin") && (
                           <Button
                             onClick={() =>
                               handleUpdate(order.name, "In Progress")
                             }
                             size="sm"
                             className="bg-primary hover:bg-primary/90 text-white cursor-pointer"
+                          >
+                            <Loader className="w-4 h-4 mr-1" />
+                            In Progress
+                          </Button>
+                        )}
+                      {order.workflow_state === "New" &&
+                        currRole == "Waiter" && (
+                          <Button
+                            onClick={() =>
+                              handleUpdate(order.name, "In Progress")
+                            }
+                            size="sm"
+                            className="bg-primary hover:bg-primary/90 text-white"
+                            disabled
                           >
                             <Loader className="w-4 h-4 mr-1" />
                             In Progress
