@@ -137,7 +137,6 @@ export const menuAPI = {
     // Fetch items and prices
     const [itemsRes, pricesRes, addonRes] = await Promise.all([
       api.get(`/resource/Item?fields=["*"]`),
-
       api.get(`/resource/Item Price?fields=["*"]`),
       api.get(`/resource/Item Add-on?fields=["*"]`),
     ]);
