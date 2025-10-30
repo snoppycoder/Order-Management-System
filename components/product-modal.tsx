@@ -89,9 +89,9 @@ export function ProductModal({
           <X className="w-5 h-5 text-gray-700 cursor-pointer" />
         </button>
         <div className="flex flex-col lg:flex-row gap-2 lg:gap-6 px-4 lg:p-6">
-          <div className="relative shrink-0 w-full sm:w-80">
-            <div className="aspect-square hidden md:block bg-gray-200 rounded-lg overflow-hidden">
-              {item.image ? (
+          {item.image ? (
+            <div className="relative shrink-0 w-full sm:w-80">
+              <div className="aspect-square hidden md:block bg-gray-200 rounded-lg overflow-hidden">
                 <img
                   src={
                     item.image
@@ -103,11 +103,11 @@ export function ProductModal({
                   alt={item.name}
                   className="w-full h-full object-cover"
                 />
-              ) : (
-                <></>
-              )}
+              </div>
             </div>
-          </div>
+          ) : (
+            <></>
+          )}
 
           <div className="flex-1 flex flex-col justify-between">
             <div>
@@ -133,7 +133,7 @@ export function ProductModal({
                 />
               </div>
 
-              <div className="lg:mb-2">
+              <div className="lg:mb-2 lg:ml-2 lg:p-2 border border-gray-200 rounded-xl  ">
                 {ADD_ONS?.length !== 0 ? (
                   <>
                     <h3 className="text-sm font-semibold text-gray-900 mb-2">
@@ -154,7 +154,7 @@ export function ProductModal({
                           <span className="text-sm text-gray-700">
                             {addOn.name}
                           </span>
-                          <span className="text-xs text-gray-500 ml-auto">
+                          <span className="text-xs text-gray-500 ml-auto mr-1">
                             + {addOn.price} Birr
                           </span>
                         </label>

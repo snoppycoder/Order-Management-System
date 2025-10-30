@@ -136,7 +136,7 @@ export const menuAPI = {
   getMenuItems: async () => {
     // Fetch items and prices
     const [itemsRes, pricesRes, addonRes] = await Promise.all([
-      api.get(`/resource/Item?fields=["*"]`),
+      api.get('/resource/Item?fields=["*"]&filters=[["disabled","=","0"]]'),
       api.get(`/resource/Item Price?fields=["*"]`),
       api.get(`/resource/Item Add-on?fields=["*"]`),
     ]);
@@ -149,7 +149,7 @@ export const menuAPI = {
     const itemsWithPrices = items.map((item: posItem) => {
       const priceEntry = prices.find(
         (p: { item_code: string }) => p.item_code === item.name
-      ); // or item.item_code depending on your field
+      );
 
       const addOnsForItem = addons
         .filter((a: { linked_item: string }) => a.linked_item === item.name)
@@ -203,7 +203,8 @@ export const orderAPI = {
     });
 
     const formattedBody = {
-      customer: body.customer,
+      custom_customer_name: body.customer,
+      // customer: body.customer,
       transaction_date: new Date().toISOString().split("T")[0],
       delivery_date: body.delivery_date,
       items: reconItems,

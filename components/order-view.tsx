@@ -25,7 +25,7 @@ interface Order {
   name: string;
   custom_room: string;
   custom_table_number: string;
-  customer: string;
+  custom_customer_name: string;
   items: Item[];
   total: number;
   status: "Billed" | "Paid";
@@ -118,8 +118,10 @@ export function OrdersView() {
           order.name === orderId ? { ...order, workflow_state: status } : order
         )
       );
+      // toast.loading(`Processing your request for order: ${orderId}`);
       await approvalWorkflow.update(status, orderId);
-      toast.success(`Processing your request for order: ${orderId}`);
+      toast.success(`Sucessfully updated your request `);
+
       // await fetchOrder();
 
       // setOrders(orders.filter((order) => order.name !== orderId));
@@ -133,7 +135,7 @@ export function OrdersView() {
   return (
     <div className="space-y-4" id="order">
       <Toaster position="top-right" richColors />
-      <div className="flex gap-2 ">
+      <div className="flex gap-2 overflow-x-auto">
         {viableTab.map((tab) => (
           <button
             key={tab}
@@ -159,18 +161,15 @@ export function OrdersView() {
         ) : (
           filteredOrders.map((order) => (
             <Card key={order.name} className="relative p-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {/* Order Details */}
-                <div>
-                  <div className="flex items-center justify-between">
-                    <h3 className="font-semibold text-gray-900">
-                      {order.customer}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 p-2 rounded-lg  bg-white">
+                <div className="space-y-1">
+                  <div className="flex flex-wrap items-center justify-between">
+                    <h3 className="font-semibold text-gray-900 text-base sm:text-lg break-words">
+                      {order.custom_customer_name}
                       {order.name}
                     </h3>
-                    {/* <span className="absolute lg:right-2 lg:mb-2 lg:top-2 text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded">
-                      {order.custom_order_status}
-                    </span> */}
                   </div>
+
                   <p className="text-sm text-gray-600">
                     <strong>Room:</strong> {order?.custom_room}
                   </p>
@@ -178,99 +177,113 @@ export function OrdersView() {
                     <strong>Table:</strong> {order?.custom_table_number}
                   </p>
                   <p className="text-sm text-gray-600">
-                    <strong>Customer:</strong> {order.customer || "N/A"}
+                    <strong>Customer:</strong>{" "}
+                    {order.custom_customer_name || "N/A"}
                   </p>
-                  {/* <p className="text-sm text-gray-600">
-                    <strong>Time:</strong> {order?.timestamp}
-                  </p> */}
                 </div>
 
-                <div>
-                  <div className="mb-3">
-                    {/* <p className="text-sm font-medium text-gray-900 mb-1">
-                      Items:
-                    </p>
-                    <ul className="text-sm text-gray-600 space-y-1">
-                      {order &&
-                        order?.localItems?.map((order: MenuItem) => (
-                          <li>{order.name}</li>
-                        ))}
-                    </ul> */}
+                {(currRole === "Cashier" || currRole === "Waiter") && (
+                  <div className="flex justify-center items-center font-bold text-base sm:text-lg text-gray-900 text-center">
+                    Total: {order.total} Birr
                   </div>
-                  <div className="flex items-center justify-between">
-                    <span className="font-bold text-lg text-gray-900">
-                      Total: {order.total} Birr
-                    </span>
-                    <div className="flex gap-2">
-                      {order.workflow_state === "Billed" && (
+                )}
+
+                <div className="flex justify-center md:justify-end">
+                  <div className="flex flex-wrap gap-2">
+                    {order.workflow_state === "Billed" && (
+                      <Button
+                        onClick={() => handleUpdate(order.name, "Paid")}
+                        size="sm"
+                        className="bg-primary hover:bg-primary/90 text-white cursor-pointer flex items-center"
+                      >
+                        <DollarSign className="w-4 h-4 mr-1" />
+                        Pay
+                      </Button>
+                    )}
+
+                    {order.workflow_state === "New" &&
+                      (currRole === "Chef" || currRole === "Admin") && (
                         <Button
-                          onClick={() => handleUpdate(order.name, "Paid")}
+                          onClick={() =>
+                            handleUpdate(order.name, "In Progress")
+                          }
                           size="sm"
-                          className="bg-primary hover:bg-primary/90 text-white cursor-pointer"
+                          className="bg-primary hover:bg-primary/90 text-white cursor-pointer flex items-center"
                         >
-                          <DollarSign className="w-4 h-4 mr-1" />
-                          Pay
+                          <Loader className="w-4 h-4 mr-1" />
+                          In Progress
                         </Button>
                       )}
-                      {order.workflow_state === "New" &&
-                        (currRole === "Chef" || currRole === "Admin") && (
-                          <Button
-                            onClick={() =>
-                              handleUpdate(order.name, "In Progress")
-                            }
-                            size="sm"
-                            className="bg-primary hover:bg-primary/90 text-white cursor-pointer"
-                          >
-                            <Loader className="w-4 h-4 mr-1" />
-                            In Progress
-                          </Button>
-                        )}
-                      {order.workflow_state === "New" &&
-                        currRole == "Waiter" && (
-                          <Button
-                            onClick={() =>
-                              handleUpdate(order.name, "In Progress")
-                            }
-                            size="sm"
-                            className="bg-primary hover:bg-primary/90 text-white"
-                            disabled
-                          >
-                            <Loader className="w-4 h-4 mr-1" />
-                            In Progress
-                          </Button>
-                        )}
-                      {order.workflow_state === "Ready" && (
+
+                    {order.workflow_state === "New" &&
+                      currRole === "Waiter" && (
+                        <Button
+                          size="sm"
+                          disabled
+                          className="bg-gray-300 text-gray-700 flex items-center"
+                        >
+                          <Loader className="w-4 h-4 mr-1" />
+                          In Progress
+                        </Button>
+                      )}
+
+                    {order.workflow_state === "Ready" &&
+                      currRole === "Waiter" && (
                         <Button
                           onClick={() => handleUpdate(order.name, "Served")}
                           size="sm"
-                          className="bg-primary hover:bg-primary/90 text-white cursor-pointer"
+                          className="bg-primary hover:bg-primary/90 text-white cursor-pointer flex items-center"
                         >
                           <HandPlatter className="w-4 h-4 mr-1" />
                           Served
                         </Button>
                       )}
 
-                      {order.workflow_state === "In Progress" && (
+                    {order.workflow_state === "Ready" &&
+                      currRole === "Chef" && (
                         <Button
-                          onClick={() => handleUpdate(order.name, "Ready")}
                           size="sm"
-                          className="bg-primary hover:bg-primary/90 text-white cursor-pointer"
+                          disabled
+                          className="bg-gray-300 text-gray-700 flex items-center"
                         >
-                          <BookCheck className="w-4 h-4 mr-1" />
-                          Ready
+                          <HandPlatter className="w-4 h-4 mr-1" />
+                          Served
                         </Button>
                       )}
-                      {order.workflow_state === "Served" && (
+
+                    {order.workflow_state === "In Progress" && (
+                      <Button
+                        onClick={() => handleUpdate(order.name, "Ready")}
+                        size="sm"
+                        className="bg-primary hover:bg-primary/90 text-white cursor-pointer flex items-center"
+                      >
+                        <BookCheck className="w-4 h-4 mr-1" />
+                        Ready
+                      </Button>
+                    )}
+                    {order.workflow_state === "Served" &&
+                      currRole == "Waiter" && (
                         <Button
-                          onClick={() => handleUpdate(order.name, "Billed")}
                           size="sm"
-                          className="bg-primary hover:bg-primary/90 text-white cursor-pointer"
+                          disabled
+                          className="bg-gray-300 text-gray-700 flex items-center"
                         >
                           <DollarSign className="w-4 h-4 mr-1" />
                           Bill
                         </Button>
                       )}
-                    </div>
+
+                    {order.workflow_state === "Served" &&
+                      currRole === "Cashier" && (
+                        <Button
+                          onClick={() => handleUpdate(order.name, "Billed")}
+                          size="sm"
+                          className="bg-primary hover:bg-primary/90 text-white cursor-pointer flex items-center"
+                        >
+                          <DollarSign className="w-4 h-4 mr-1" />
+                          Bill
+                        </Button>
+                      )}
                   </div>
                 </div>
               </div>

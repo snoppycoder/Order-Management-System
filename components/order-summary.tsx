@@ -29,14 +29,13 @@ export function OrderSummary({
   onUpdateQuantity,
   onSubmitOrder,
 }: OrderSummaryProps) {
-  console.log(items, "this is from pos-interface");
+  console.log(items, "summary");
   const calculateItemPrice = (item: OrderItem) => {
     let price = item.price_list_rate ?? 0;
 
     // if (item.variant === "Small") price = 249;
     // else if (item.variant === "Medium") price = 299;
     // else if (item.variant === "Large") price = 399;
-    console.log(items);
 
     if (item.addOns && item.addOns.length > 0) {
       const addOnPrices = item.itemAddOn!;
@@ -62,7 +61,6 @@ export function OrderSummary({
     <Card className="p-4 sticky top-6">
       <h3 className="font-semibold text-gray-900 mb-4">Order Summary</h3>
 
-      {/* Items List */}
       <div className="space-y-2 mb-4 max-h-64 overflow-y-auto">
         {items.length === 0 ? (
           <p className="text-gray-500 text-sm text-center py-4">

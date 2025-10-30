@@ -84,6 +84,9 @@ export function POSInterface({ user, onLogout }: POSInterfaceProps) {
                 quantity: i.quantity + (item.quantity || 1),
                 itemAddOn: item.itemAddOn || i.itemAddOn,
                 addOns: item.addOns || i.addOns,
+                custom_special_instruction:
+                  item.custom_special_instruction ||
+                  i.custom_special_instruction,
               }
             : i
         );
@@ -99,6 +102,7 @@ export function POSInterface({ user, onLogout }: POSInterfaceProps) {
           quantity: item.quantity || 1,
           itemAddOn: item.itemAddOn,
           addOns: item.addOns,
+          custom_special_instruction: item.custom_special_instruction,
         },
       ];
     });
