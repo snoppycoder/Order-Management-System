@@ -188,6 +188,12 @@ export const orderAPI = {
 
     return orders;
   },
+  getOrderDetail: async (ordername: string) => {
+    const response = await api.get(
+      `/resource/Sales Order/${ordername}?fields=["*"]`
+    );
+    return response.data;
+  },
 
   createOrder: async (body: submittableOrder) => {
     const items: posItem[] = body.items;

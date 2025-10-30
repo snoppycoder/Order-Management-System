@@ -1,74 +1,95 @@
+"use client";
+
 import {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogFooter,
 } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
+import { BadgeCheck, UtensilsCrossed, X } from "lucide-react";
+import { useEffect, useState } from "react";
+import { orderAPI } from "@/lib/api";
+
+interface OrderItem {
+  item_name: string;
+  qty: number;
+  custom_add_ons: string;
+}
 
 interface OrderDetailModalProps {
   open: boolean;
   onClose: () => void;
-  item: {
-    name: string;
-    qty: number;
-    addons?: { name: string; qty: number }[];
-  } | null;
+  ordername: string;
 }
 
 export default function OrderDetailModal({
   open,
   onClose,
-  item,
+  ordername,
 }: OrderDetailModalProps) {
-  if (!item) return null;
+  const [order, setOrder] = useState<OrderItem[]>([]);
+
+  useEffect(() => {
+    if (!ordername) return;
+
+    const fetchDescription = async () => {
+      const res = await orderAPI.getOrderDetail(ordername);
+      setOrder(res.data.items);
+    };
+
+    fetchDescription();
+  }, [ordername]);
+
+  if (!order.length) return null;
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-md rounded-xl">
-        <DialogHeader>
-          <DialogTitle className="text-lg font-semibold">
-            Order Details
+      <DialogContent className="max-w-md rounded-xl shadow-lg p-0 ">
+        <DialogHeader className="border-b px-6 py-4 bg-primary text-white rounded-t-xl">
+          <DialogTitle className="text-lg font-bold flex items-center gap-2">
+            <UtensilsCrossed size={18} /> Order Details
           </DialogTitle>
         </DialogHeader>
 
-        <div className="space-y-4">
-          {/* Menu Item */}
-          <div className="flex justify-between text-sm">
-            <span className="font-medium">Menu Item:</span>
-            <span>{item.name}</span>
-          </div>
+        <div className="space-y-4 max-h-80 overflow-y-auto p-6">
+          {order.map((item, idx) => (
+            <div key={idx} className="border rounded-lg p-4 shadow-sm bg-white">
+              <div className="flex justify-between">
+                <span className="text-gray-500 text-sm">Item</span>
+                <span className="font-semibold text-gray-800">
+                  {item.item_name}
+                </span>
+              </div>
 
-          {/* Quantity */}
-          <div className="flex justify-between text-sm">
-            <span className="font-medium">Qty:</span>
-            <span>{item.qty}</span>
-          </div>
+              <div className="flex justify-between mt-2">
+                <span className="text-gray-500 text-sm">Quantity</span>
+                <span className="font-medium">{item.qty}</span>
+              </div>
 
-          {/* Add-ons */}
-          <div>
-            <p className="font-medium text-sm mb-1">Add-ons:</p>
+              <div className="mt-4">
+                <p className="font-medium text-sm mb-2">Add-ons</p>
 
-            {item.addons && item.addons.length > 0 ? (
-              <ul className="list-disc ml-4 space-y-1 text-sm">
-                {item.addons.map((addon, index) => (
-                  <li key={index}>
-                    {addon.name} × {addon.qty}
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <p className="text-sm text-gray-500">No add-ons selected</p>
-            )}
-          </div>
+                {item?.custom_add_ons?.length ? (
+                  <div className="flex flex-wrap gap-2">
+                    {item.custom_add_ons.split(",").map((addon, i) => (
+                      <span
+                        key={i}
+                        className="flex items-center gap-1 bg-primary/10 text-primary border border-primary/20 px-2 py-1 rounded-md text-xs font-medium"
+                      >
+                        <BadgeCheck size={12} /> {addon.trim()}
+                      </span>
+                    ))}
+                  </div>
+                ) : (
+                  <span className="text-xs text-gray-500 italic">
+                    No add-ons
+                  </span>
+                )}
+              </div>
+            </div>
+          ))}
         </div>
-
-        <DialogFooter>
-          <Button variant="outline" onClick={onClose}>
-            Close
-          </Button>
-        </DialogFooter>
       </DialogContent>
     </Dialog>
   );

@@ -16,6 +16,7 @@ import {
 import { Toaster, toast } from "sonner";
 import { approvalWorkflow, orderAPI } from "@/lib/api";
 import { MenuItem } from "./menu-browser";
+import OrderDetailModal from "./order-detail-modal";
 
 export interface Item {
   name: string;
@@ -42,6 +43,7 @@ export function OrdersView() {
   const currRole = localStorage.getItem("role");
   const [open, setOpen] = useState(false);
   const [viableTab, setViableTab] = useState<string[]>([]);
+  const [orderName, setOrderName] = useState<string>("");
   // if role is waiter
   let filteredOrders: Order[];
   const waiterTab = ["New", "Ready", "Served"];
@@ -84,7 +86,7 @@ export function OrdersView() {
     fetchOrder();
   }, []);
   if (!mounted) return null;
-  if (!orders) return <>Loading orders...</>;
+  if (!orders) return <div className="text-center">Loading orders...</div>;
 
   if (currRole?.toLowerCase() == "Waiter".toLowerCase()) {
     const myOrder = orders.filter(
@@ -227,17 +229,22 @@ export function OrdersView() {
                       </Button>
                     )}
 
-                    {/* {(currRole === "Waiter" ||
-                      (currRole === "Chef" &&
-                        order.workflow_state === "New")) && (
-                      <Button
-                        size="sm"
-                        className="bg-blue-400 hover:bg-bg-blue-400/90 text-white font-semibold cursor-pointer flex items-center"
-                      >
-                        <Hamburger className="w-4 h-4 mr-1" />
-                        Order Detail
-                      </Button>
-                    )} */}
+                    {order.workflow_state == "New" &&
+                      (currRole == "Chef" ||
+                        currRole == "Admin" ||
+                        currRole == "Waiter") && (
+                        <Button
+                          onClick={() => {
+                            setOpen(true);
+                            setOrderName(order.name);
+                          }}
+                          size="sm"
+                          className="bg-blue-400 hover:bg-blue-400/90 text-white font-semibold cursor-pointer flex items-center"
+                        >
+                          <Hamburger className="w-4 h-4 mr-1" />
+                          Order Detail
+                        </Button>
+                      )}
 
                     {order.workflow_state == "Ready" && currRole == "Chef" && (
                       <Button
@@ -301,6 +308,11 @@ export function OrdersView() {
           ))
         )}
       </div>
+      <OrderDetailModal
+        open={open}
+        onClose={() => setOpen(false)}
+        ordername={orderName}
+      />
     </div>
   );
 }
