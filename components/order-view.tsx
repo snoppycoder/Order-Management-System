@@ -10,6 +10,7 @@ import {
   Loader,
   HandPlatter,
   BookCheck,
+  Hamburger,
 } from "lucide-react";
 
 import { Toaster, toast } from "sonner";
@@ -39,7 +40,7 @@ interface Order {
 export function OrdersView() {
   const [orders, setOrders] = useState<Order[]>();
   const currRole = localStorage.getItem("role");
-
+  const [open, setOpen] = useState(false);
   const [viableTab, setViableTab] = useState<string[]>([]);
   // if role is waiter
   let filteredOrders: Order[];
@@ -188,8 +189,8 @@ export function OrdersView() {
                   </div>
                 )}
 
-                <div className="flex justify-center md:justify-end">
-                  <div className="flex flex-wrap gap-2">
+                <div className="flex justify-center items-center md:justify-end">
+                  <div className="flex flex-wrap gap-x-8">
                     {order.workflow_state == "Billed" && (
                       <Button
                         onClick={() => handleUpdate(order.name, "Paid")}
@@ -226,17 +227,17 @@ export function OrdersView() {
                       </Button>
                     )}
 
-                    {order.workflow_state == "Ready" &&
-                      currRole == "Waiter" && (
-                        <Button
-                          onClick={() => handleUpdate(order.name, "Served")}
-                          size="sm"
-                          className="bg-primary hover:bg-primary/90 text-white cursor-pointer flex items-center"
-                        >
-                          <HandPlatter className="w-4 h-4 mr-1" />
-                          Served
-                        </Button>
-                      )}
+                    {/* {(currRole === "Waiter" ||
+                      (currRole === "Chef" &&
+                        order.workflow_state === "New")) && (
+                      <Button
+                        size="sm"
+                        className="bg-blue-400 hover:bg-bg-blue-400/90 text-white font-semibold cursor-pointer flex items-center"
+                      >
+                        <Hamburger className="w-4 h-4 mr-1" />
+                        Order Detail
+                      </Button>
+                    )} */}
 
                     {order.workflow_state == "Ready" && currRole == "Chef" && (
                       <Button
@@ -248,6 +249,17 @@ export function OrdersView() {
                         Served
                       </Button>
                     )}
+                    {order.workflow_state == "Ready" &&
+                      (currRole == "Waiter" || currRole == "Admin") && (
+                        <Button
+                          onClick={() => handleUpdate(order.name, "Served")}
+                          size="sm"
+                          className="bg-primary hover:bg-primary/90 text-white cursor-pointer flex items-center"
+                        >
+                          <HandPlatter className="w-4 h-4 mr-1" />
+                          Served
+                        </Button>
+                      )}
 
                     {order.workflow_state == "In Progress" && (
                       <Button
