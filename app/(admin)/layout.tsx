@@ -23,6 +23,8 @@ export default function DashboardLayout({
   const router = useRouter();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [user, setUser] = useState<{ name: string; role: string } | null>(null);
+  const currRole = localStorage.getItem("role");
+  console.log(currRole);
 
   const handleLogout = () => {
     router.replace("/login");

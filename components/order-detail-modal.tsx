@@ -15,6 +15,7 @@ interface OrderItem {
   item_name: string;
   qty: number;
   custom_add_ons: string;
+  custom_special_instruction: string;
 }
 
 interface OrderDetailModalProps {
@@ -36,6 +37,7 @@ export default function OrderDetailModal({
     const fetchDescription = async () => {
       const res = await orderAPI.getOrderDetail(ordername);
       setOrder(res.data.items);
+      console.log(res.data.items, "logs");
     };
 
     fetchDescription();
@@ -87,6 +89,12 @@ export default function OrderDetailModal({
                   </span>
                 )}
               </div>
+              {item.custom_special_instruction && (
+                <div className="mt-4">
+                  <h1 className="font-medium text-sm ">Special Instruction:</h1>
+                  {item.custom_special_instruction}
+                </div>
+              )}
             </div>
           ))}
         </div>
