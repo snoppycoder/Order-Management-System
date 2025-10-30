@@ -284,7 +284,7 @@ export function OrdersView() {
                       )}
 
                     {order.workflow_state === "Served" &&
-                      currRole == "Cashier" && (
+                      (currRole == "Cashier" || currRole == "Admin") && (
                         <Button
                           onClick={() => handleUpdate(order.name, "Billed")}
                           size="sm"
