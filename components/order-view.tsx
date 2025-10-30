@@ -167,7 +167,7 @@ export function OrdersView() {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 p-2 rounded-lg  bg-white">
                 <div className="space-y-1">
                   <div className="flex flex-wrap items-center justify-between">
-                    <h3 className="font-semibold text-gray-900 text-base sm:text-lg break-words">
+                    <h3 className="font-semibold text-gray-900 text-base sm:text-lg ">
                       {order.custom_customer_name}
                       {order.name}
                     </h3>

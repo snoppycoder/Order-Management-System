@@ -2,7 +2,6 @@
 
 import {
   Dialog,
-  DialogClose,
   DialogContent,
   DialogHeader,
   DialogTitle,
@@ -37,7 +36,6 @@ export default function OrderDetailModal({
     const fetchDescription = async () => {
       const res = await orderAPI.getOrderDetail(ordername);
       setOrder(res.data.items);
-      console.log(res.data.items, "logs");
     };
 
     fetchDescription();
@@ -58,14 +56,14 @@ export default function OrderDetailModal({
           {order.map((item, idx) => (
             <div key={idx} className="border rounded-lg p-4 shadow-sm bg-white">
               <div className="flex justify-between">
-                <span className="text-gray-500 text-sm">Item</span>
+                <span className="font-medium text-sm">Item</span>
                 <span className="font-semibold text-gray-800">
                   {item.item_name}
                 </span>
               </div>
 
               <div className="flex justify-between mt-2">
-                <span className="text-gray-500 text-sm">Quantity</span>
+                <span className="font-medium text-sm">Quantity</span>
                 <span className="font-medium">{item.qty}</span>
               </div>
 
