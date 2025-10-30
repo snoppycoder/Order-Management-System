@@ -31,6 +31,7 @@ export function MenuItemForm({ item, onSave, onClose }: MenuItemFormProps) {
   const [imagePreview, setImagePreview] = useState<string | undefined>(
     item?.image
   );
+
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const categories = [
@@ -78,8 +79,9 @@ export function MenuItemForm({ item, onSave, onClose }: MenuItemFormProps) {
         onSave({ ...item, ...formData, price_list_rate: numericPrice });
       } else {
         onSave({
-          ...formData, price_list_rate: numericPrice,
-          itemAddOn: []
+          ...formData,
+          price_list_rate: numericPrice,
+          itemAddOn: [],
         });
       }
       toast.success("Menu item added");
