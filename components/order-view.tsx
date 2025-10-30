@@ -28,7 +28,7 @@ interface Order {
   customer: string;
   items: Item[];
   total: number;
-  status: "Billed" | "Cancelled" | "Paid";
+  status: "Billed" | "Paid";
   timestamp: string;
   workflow_state: string;
   custom_order_status: string;
@@ -44,8 +44,8 @@ export function OrdersView() {
   // if role is waiter
   let filteredOrders: Order[];
   const waiterTab = ["New", "Ready", "Served"];
-  const chefTab = ["New", "In progress"];
-  const cashierTab = ["Served", "Billed", "Paid", "Cancelled"];
+  const chefTab = ["New", "In Progress", "Ready"];
+  const cashierTab = ["Served", "Billed", "Paid"];
   const adminTab = ["New", "In Progress", "Ready", "Served", "Billed", "Paid"];
 
   const [selectedTab, setSelectedTab] = useState<string>();
@@ -68,11 +68,7 @@ export function OrdersView() {
 
   useEffect(() => {
     setMounted(true);
-    // const fetchOrder = async () => {
-    //   const res = await orderAPI.listOrder();
-    //   setOrders(Array.isArray(res) ? res : res.data || []);
-    //   console.log(res);
-    // };
+
     const fetchOrder = async () => {
       try {
         const res = await orderAPI.listOrder();
@@ -89,7 +85,6 @@ export function OrdersView() {
   if (!mounted) return null;
   if (!orders) return <>Loading orders...</>;
 
-  // if (!orders) return <>Loading orders...</>;
   if (currRole?.toLowerCase() == "Waiter".toLowerCase()) {
     const myOrder = orders.filter(
       (order) =>
@@ -137,7 +132,6 @@ export function OrdersView() {
 
   return (
     <div className="space-y-4" id="order">
-      {/* Tabs */}
       <Toaster position="top-right" richColors />
       <div className="flex gap-2 ">
         {viableTab.map((tab) => (
