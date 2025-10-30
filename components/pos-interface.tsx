@@ -8,7 +8,7 @@ import { Toaster, toast } from "sonner";
 import { AddOn, MenuBrowser } from "./menu-browser";
 import { OrderSummary } from "./order-summary";
 import { OrdersView } from "./order-view";
-import { menuAPI, authAPI, orderAPI } from "@/lib/api";
+import { orderAPI } from "@/lib/api";
 
 interface POSInterfaceProps {
   user: { name: string; role: string } | null;
@@ -21,6 +21,7 @@ export interface posItem {
   quantity: number;
   custom_special_instruction?: string;
   itemAddOn?: AddOn[];
+  custom_add_ons?: string;
   addOns?: string[];
 }
 export interface submittableOrder {
@@ -28,6 +29,7 @@ export interface submittableOrder {
   waiter: string;
   delivery_date: string;
   transaction_date: string;
+
   items: posItem[];
   custom_table_number: string;
   custom_room: string;
@@ -62,17 +64,7 @@ export function POSInterface({ user, onLogout }: POSInterfaceProps) {
   const currentRoom = rooms.find((r) => r.id === selectedRoom);
 
   const handleAddItem = (item: posItem) => {
-    // setCartItems((prev) => {
-    //   const existingItem = prev.find((i) => i.name === item.name);
-
-    //   if (existingItem) {
-    //     // If the modal passes a quantity, add that amount instead of just +1
-    //     return prev.map((i) =>
-    //       i.id === item.id
-    //         ? { ...i, quantity: i.quantity + (item.quantity || 1) }
-    //         : i
-    //     );
-    //   }
+    const customAddOnsString = item.addOns?.join(", ") || "";
     setCartItems((prev) => {
       const existingItem = prev.find((i) => i.name === item.name);
 
@@ -87,6 +79,7 @@ export function POSInterface({ user, onLogout }: POSInterfaceProps) {
                 custom_special_instruction:
                   item.custom_special_instruction ||
                   i.custom_special_instruction,
+                custom_add_ons: customAddOnsString || i.custom_add_ons || "",
               }
             : i
         );
@@ -103,6 +96,7 @@ export function POSInterface({ user, onLogout }: POSInterfaceProps) {
           itemAddOn: item.itemAddOn,
           addOns: item.addOns,
           custom_special_instruction: item.custom_special_instruction,
+          custom_add_ons: customAddOnsString,
         },
       ];
     });
@@ -131,6 +125,7 @@ export function POSInterface({ user, onLogout }: POSInterfaceProps) {
       toast.error("Please add items to the order");
       return;
     }
+
     const orderObj: submittableOrder = {
       customer: customerName || "Aderaw", // if the customer is not in the db add later on
       waiter: localStorage.getItem("email") || "zena@gmail.com",
@@ -140,6 +135,7 @@ export function POSInterface({ user, onLogout }: POSInterfaceProps) {
       custom_table_number: selectedTable,
       custom_room: selectedRoom,
     };
+
     try {
       localStorage.setItem("items", JSON.stringify(cartItems));
       await orderAPI.createOrder(orderObj);

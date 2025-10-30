@@ -182,7 +182,7 @@ export function OrdersView() {
                   </p>
                 </div>
 
-                {(currRole === "Cashier" || currRole === "Waiter") && (
+                {(currRole == "Cashier" || currRole == "Waiter") && (
                   <div className="flex justify-center items-center font-bold text-base sm:text-lg text-gray-900 text-center">
                     Total: {order.total} Birr
                   </div>
@@ -190,7 +190,7 @@ export function OrdersView() {
 
                 <div className="flex justify-center md:justify-end">
                   <div className="flex flex-wrap gap-2">
-                    {order.workflow_state === "Billed" && (
+                    {order.workflow_state == "Billed" && (
                       <Button
                         onClick={() => handleUpdate(order.name, "Paid")}
                         size="sm"
@@ -201,8 +201,8 @@ export function OrdersView() {
                       </Button>
                     )}
 
-                    {order.workflow_state === "New" &&
-                      (currRole === "Chef" || currRole === "Admin") && (
+                    {order.workflow_state == "New" &&
+                      (currRole == "Chef" || currRole == "Admin") && (
                         <Button
                           onClick={() =>
                             handleUpdate(order.name, "In Progress")
@@ -215,20 +215,19 @@ export function OrdersView() {
                         </Button>
                       )}
 
-                    {order.workflow_state === "New" &&
-                      currRole === "Waiter" && (
-                        <Button
-                          size="sm"
-                          disabled
-                          className="bg-gray-300 text-gray-700 flex items-center"
-                        >
-                          <Loader className="w-4 h-4 mr-1" />
-                          In Progress
-                        </Button>
-                      )}
+                    {order.workflow_state == "New" && currRole == "Waiter" && (
+                      <Button
+                        size="sm"
+                        disabled
+                        className="bg-gray-300 text-gray-700 flex items-center"
+                      >
+                        <Loader className="w-4 h-4 mr-1" />
+                        In Progress
+                      </Button>
+                    )}
 
-                    {order.workflow_state === "Ready" &&
-                      currRole === "Waiter" && (
+                    {order.workflow_state == "Ready" &&
+                      currRole == "Waiter" && (
                         <Button
                           onClick={() => handleUpdate(order.name, "Served")}
                           size="sm"
@@ -239,19 +238,18 @@ export function OrdersView() {
                         </Button>
                       )}
 
-                    {order.workflow_state === "Ready" &&
-                      currRole === "Chef" && (
-                        <Button
-                          size="sm"
-                          disabled
-                          className="bg-gray-300 text-gray-700 flex items-center"
-                        >
-                          <HandPlatter className="w-4 h-4 mr-1" />
-                          Served
-                        </Button>
-                      )}
+                    {order.workflow_state == "Ready" && currRole == "Chef" && (
+                      <Button
+                        size="sm"
+                        disabled
+                        className="bg-gray-300 text-gray-700 flex items-center"
+                      >
+                        <HandPlatter className="w-4 h-4 mr-1" />
+                        Served
+                      </Button>
+                    )}
 
-                    {order.workflow_state === "In Progress" && (
+                    {order.workflow_state == "In Progress" && (
                       <Button
                         onClick={() => handleUpdate(order.name, "Ready")}
                         size="sm"
@@ -261,7 +259,7 @@ export function OrdersView() {
                         Ready
                       </Button>
                     )}
-                    {order.workflow_state === "Served" &&
+                    {order.workflow_state == "Served" &&
                       currRole == "Waiter" && (
                         <Button
                           size="sm"
@@ -274,7 +272,7 @@ export function OrdersView() {
                       )}
 
                     {order.workflow_state === "Served" &&
-                      currRole === "Cashier" && (
+                      currRole == "Cashier" && (
                         <Button
                           onClick={() => handleUpdate(order.name, "Billed")}
                           size="sm"

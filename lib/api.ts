@@ -144,7 +144,6 @@ export const menuAPI = {
     const items = itemsRes.data.data;
     const prices = pricesRes.data.data;
     const addons = addonRes.data.data;
-    console.log(addons);
 
     const itemsWithPrices = items.map((item: posItem) => {
       const priceEntry = prices.find(
@@ -205,6 +204,7 @@ export const orderAPI = {
     const formattedBody = {
       custom_customer_name: body.customer,
       // customer: body.customer,
+
       transaction_date: new Date().toISOString().split("T")[0],
       delivery_date: body.delivery_date,
       items: reconItems,
