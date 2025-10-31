@@ -26,6 +26,15 @@ export default function DashboardLayout({
   const [user, setUser] = useState<{ name: string; role: string } | null>(null);
   const [loading, setLoading] = useState(true);
   const systemRoles = ["Waiter", "Cashier", "Chef", "Admin", "Bartender"];
+  const [initials, setInitials] = useState("");
+  const roleInitials: Record<string, string> = {
+    Waiter: "WT",
+    Cashier: "CS",
+    Chef: "CF",
+    Admin: "AD",
+    Bartender: "BT",
+  };
+  let init;
   useEffect(() => {
     const fetchSession = async () => {
       try {
@@ -54,6 +63,10 @@ export default function DashboardLayout({
                   break;
                 }
               }
+              let currRole = localStorage.getItem("role") ?? "Waiter";
+              console.log(currRole, "try");
+
+              setInitials(roleInitials[currRole] || "");
             }
           }
           setLoading(false);
@@ -104,7 +117,7 @@ export default function DashboardLayout({
                         }`}
                       >
                         <AvatarImage src="/admin-avatar.png" alt="Admin" />
-                        <AvatarFallback>WT</AvatarFallback>
+                        <AvatarFallback>{initials}</AvatarFallback>
                       </Avatar>
                     </Button>
                   </DropdownMenuTrigger>

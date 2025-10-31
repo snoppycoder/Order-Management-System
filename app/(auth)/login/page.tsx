@@ -28,17 +28,14 @@ export default function LoginPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (username && password) {
-      // const value = authAPI.login(username, password).then(({ user }) => {
-      //   console.log("Logged in user:", user);
-      //   localStorage.setItem("loggedInUser", JSON.stringify(user));
-      //   router.replace("/");
-      // });
+
       try {
         const value = await authAPI.login(username, password);
         if (value.message == "Logged In") {
           console.log(value.role, "role");
           router.replace("/");
-        } else {
+        }
+         else {
           throw Error("Invalid credential");
         }
       } catch (error) {
@@ -47,6 +44,8 @@ export default function LoginPage() {
         setMessage(err.response.data.message);
       }
     }
+    
+  
   };
 
   return (
