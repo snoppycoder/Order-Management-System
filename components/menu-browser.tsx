@@ -7,7 +7,7 @@ import { Plus, Search } from "lucide-react";
 import { useDebounce } from "@/hooks/useDebouce";
 import { ProductModal } from "./product-modal";
 import { OrderItem } from "./order-summary";
-import { menuAPI } from "@/lib/api";
+import { menuAPI, orderAPI } from "@/lib/api";
 import { MENU_CACHE_KEY, CACHE_TTL } from "@/utils/constant";
 import { posItem } from "./pos-interface";
 export interface AddOn {
@@ -70,7 +70,7 @@ export function MenuBrowser({ onAddItem }: MenuBrowserProps) {
     const fetchMenu = async () => {
       const response = await menuAPI.getMenuItems();
       const items = Array.isArray(response) ? response : response?.data || [];
-      console.log(items, "menu");
+
       localStorage.setItem(
         MENU_CACHE_KEY,
         JSON.stringify({ items, timestamp: Date.now() })

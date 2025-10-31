@@ -104,14 +104,11 @@ export function OrdersView() {
     );
   } else if (currRole == "Bartender") {
     filteredOrders = orders.filter(
-      (order) =>
-        order.custom_item_type === "Bar" && order.workflow_state == selectedTab
+      (order) => order.workflow_state == selectedTab
     );
   } else if (currRole == "Chef") {
     filteredOrders = orders.filter(
-      (order) =>
-        order.custom_item_type === "Restaurant" &&
-        order.workflow_state == selectedTab
+      (order) => order.workflow_state == selectedTab
     );
   } else {
     filteredOrders = orders.filter(
