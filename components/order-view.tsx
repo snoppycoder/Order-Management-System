@@ -36,6 +36,7 @@ interface Order {
   custom_order_status: string;
   localItems: MenuItem[];
   owner: string;
+  custom_item_type: "Bar" | "Restaurant";
 }
 
 export function OrdersView() {
@@ -50,6 +51,7 @@ export function OrdersView() {
   const chefTab = ["New", "In Progress", "Ready"];
   const cashierTab = ["Served", "Billed", "Paid"];
   const adminTab = ["New", "In Progress", "Ready", "Served", "Billed", "Paid"];
+  const bartenderTab = ["New", "In Progress", "Ready"];
 
   const [selectedTab, setSelectedTab] = useState<string>();
   useEffect(() => {
@@ -62,6 +64,9 @@ export function OrdersView() {
     } else if (currRole == "Chef") {
       setViableTab(chefTab);
       setSelectedTab(chefTab[0]);
+    } else if (currRole == "Bartender") {
+      setViableTab(bartenderTab);
+      setSelectedTab(bartenderTab[0]);
     } else {
       setViableTab(cashierTab);
       setSelectedTab(cashierTab[0]);
@@ -96,6 +101,17 @@ export function OrdersView() {
     );
     filteredOrders = myOrder.filter(
       (order) => order.workflow_state === selectedTab
+    );
+  } else if (currRole == "Bartender") {
+    filteredOrders = orders.filter(
+      (order) =>
+        order.custom_item_type === "Bar" && order.workflow_state == selectedTab
+    );
+  } else if (currRole == "Chef") {
+    filteredOrders = orders.filter(
+      (order) =>
+        order.custom_item_type === "Restaurant" &&
+        order.workflow_state == selectedTab
     );
   } else {
     filteredOrders = orders.filter(

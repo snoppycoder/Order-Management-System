@@ -19,6 +19,7 @@ export interface posItem {
   name: string;
   price_list_rate: number;
   quantity: number;
+  custom_variant_items?: string;
   custom_special_instruction?: string;
   itemAddOn?: AddOn[];
   custom_add_ons?: string;
@@ -80,6 +81,8 @@ export function POSInterface({ user, onLogout }: POSInterfaceProps) {
                   item.custom_special_instruction ||
                   i.custom_special_instruction,
                 custom_add_ons: customAddOnsString || i.custom_add_ons || "",
+                custom_variant_items:
+                  item.custom_variant_items || i.custom_variant_items,
               }
             : i
         );
@@ -97,6 +100,7 @@ export function POSInterface({ user, onLogout }: POSInterfaceProps) {
           addOns: item.addOns,
           custom_special_instruction: item.custom_special_instruction,
           custom_add_ons: customAddOnsString,
+          custom_variant_items: item.custom_variant_items,
         },
       ];
     });

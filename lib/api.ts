@@ -57,7 +57,6 @@ api.interceptors.response.use(
 
 export const authAPI = {
   login: async (usr: string, pwd: string) => {
-    let res;
     try {
       const response = await api.post(
         "/method/login",
@@ -172,7 +171,7 @@ export const menuAPI = {
 export const orderAPI = {
   listOrder: async () => {
     const response = await api.get(
-      `/resource/Sales Order?fields=["*"]&order_by=creation desc`
+      `/resource/Sales Order?fields=["*"]&order_by=creation desc&limit_page_length=100&limit_start=0`
     );
 
     const orders = response.data.data || [];
@@ -210,7 +209,6 @@ export const orderAPI = {
     const formattedBody = {
       custom_customer_name: body.customer,
       // customer: body.customer,
-
       transaction_date: new Date().toISOString().split("T")[0],
       delivery_date: body.delivery_date,
       items: reconItems,
@@ -218,7 +216,7 @@ export const orderAPI = {
       custom_table_number: `Table-${body.custom_table_number}`,
       custom_room: body.custom_room,
     };
-    console.log(formattedBody, "data to  be sent");
+
     const response = await api.post("/resource/Sales Order", formattedBody);
     return response.data;
   },

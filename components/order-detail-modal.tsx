@@ -6,7 +6,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { BadgeCheck, UtensilsCrossed, X } from "lucide-react";
+import { BadgeCheck, Rss, UtensilsCrossed, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { orderAPI } from "@/lib/api";
 
@@ -15,6 +15,7 @@ interface OrderItem {
   qty: number;
   custom_add_ons: string;
   custom_special_instruction: string;
+  custom_variant_items: string;
 }
 
 interface OrderDetailModalProps {
@@ -36,6 +37,7 @@ export default function OrderDetailModal({
     const fetchDescription = async () => {
       const res = await orderAPI.getOrderDetail(ordername);
       setOrder(res.data.items);
+      console.log(res.data.items);
     };
 
     fetchDescription();
@@ -91,6 +93,12 @@ export default function OrderDetailModal({
                 <div className="mt-4">
                   <h1 className="font-medium text-sm ">Special Instruction:</h1>
                   {item.custom_special_instruction}
+                </div>
+              )}
+              {item.custom_variant_items && (
+                <div className="mt-4">
+                  <h1 className="font-medium text-sm ">Variant</h1>
+                  {item.custom_variant_items}
                 </div>
               )}
             </div>

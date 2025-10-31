@@ -103,7 +103,7 @@ export function MenuBrowser({ onAddItem }: MenuBrowserProps) {
       ...item,
       quantity,
       custom_special_instruction,
-      variant: selectedVariant,
+      custom_variant_items: selectedVariant,
       addOns,
     };
     onAddItem(existingItem);

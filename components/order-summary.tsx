@@ -10,7 +10,7 @@ export interface OrderItem {
   name: string;
   addOns?: string[];
   price_list_rate: number;
-  variant?: string;
+  custom_variant_items?: string;
   quantity: number;
   custom_special_instruction?: string;
   itemAddOn?: AddOn[];
@@ -79,8 +79,10 @@ export function OrderSummary({
                     <p className="text-sm font-medium text-gray-900">
                       {item.name}
                     </p>
-                    {item.variant && (
-                      <p className="text-xs text-gray-500">{item.variant}</p>
+                    {item.custom_variant_items && (
+                      <p className="text-xs text-gray-500">
+                        {item.custom_variant_items}
+                      </p>
                     )}
                     {item.addOns && item.addOns.length > 0 && (
                       <p className="text-xs text-gray-500">

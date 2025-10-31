@@ -25,7 +25,7 @@ export default function DashboardLayout({
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [user, setUser] = useState<{ name: string; role: string } | null>(null);
   const [loading, setLoading] = useState(true);
-  const systemRoles = ["Waiter", "Cashier", "Chef", "Admin"];
+  const systemRoles = ["Waiter", "Cashier", "Chef", "Admin", "Bartender"];
   useEffect(() => {
     const fetchSession = async () => {
       try {
