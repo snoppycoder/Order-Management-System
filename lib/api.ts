@@ -229,11 +229,13 @@ export const orderAPI = {
 
     await api.put(`/resource/Sales Order/${ordername}`, {
       custom_approval_digit: newDigit,
+      custom_button_disabled: 1,
     });
 
     return {
       success: newDigit >= 2,
       currentDigit: newDigit,
+      
     };
   },
 };

@@ -38,6 +38,7 @@ interface Order {
   localItems: MenuItem[];
   owner: string;
   custom_item_type: "Bar" | "Restaurant";
+  custom_button_disabled: number;
 }
 
 export function OrdersView() {
@@ -53,7 +54,9 @@ export function OrdersView() {
   const cashierTab = ["Served", "Billed", "Paid"];
   const adminTab = ["New", "In Progress", "Ready", "Served", "Billed", "Paid"];
   const bartenderTab = ["New", "In Progress", "Ready"];
-  const [disabled, setDisabled] = useState(false);
+  const [disabledOrders, setDisabledOrders] = useState<{
+    [key: string]: boolean;
+  }>({});
 
   const [selectedTab, setSelectedTab] = useState<string>();
   useEffect(() => {
@@ -136,14 +139,19 @@ export function OrdersView() {
   // };
 
   const handleUpdate = async (order: Order, status: string) => {
+    console.log(order, "to be updated");
     try {
       const orderId = order.name;
       if (
         order.custom_order_type == "Both" &&
         order.workflow_state == "In Progress"
       ) {
-        setDisabled(true);
         const res = await orderAPI.updateApprovalDigit(order.name);
+
+        setDisabledOrders((prev) => ({
+          ...prev,
+          [order.name]: order.custom_button_disabled === 0,
+        }));
 
         if (res.success) {
           setOrders((prev) =>
@@ -322,6 +330,7 @@ export function OrdersView() {
                         onClick={() => handleUpdate(order, "Ready")}
                         size="sm"
                         className="bg-primary hover:bg-primary/90 text-white cursor-pointer flex items-center"
+                        disabled={disabledOrders[order.name] ?? false}
                       >
                         <BookCheck className="w-4 h-4 mr-1" />
                         Ready
