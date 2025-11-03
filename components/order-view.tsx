@@ -39,6 +39,7 @@ interface Order {
   owner: string;
   custom_item_type: "Bar" | "Restaurant";
   custom_button_disabled: number;
+  custom_approver?: string;
 }
 
 export function OrdersView() {
@@ -60,6 +61,10 @@ export function OrdersView() {
 
   const [selectedTab, setSelectedTab] = useState<string>();
   useEffect(() => {
+    const storedDisabledOrders = JSON.parse(
+      localStorage.getItem("disabledOrder") || "{}"
+    );
+    setDisabledOrders(storedDisabledOrders);
     if (currRole == "Waiter") {
       setViableTab(waiterTab);
       setSelectedTab(waiterTab[0]);
@@ -137,7 +142,6 @@ export function OrdersView() {
   //   );
   //   console.log(orders);
   // };
-
   const handleUpdate = async (order: Order, status: string) => {
     console.log(order, "to be updated");
     try {
@@ -146,7 +150,10 @@ export function OrdersView() {
         order.custom_order_type == "Both" &&
         order.workflow_state == "In Progress"
       ) {
-        const res = await orderAPI.updateApprovalDigit(order.name);
+        const res = await orderAPI.updateApprovalDigit(
+          order.name,
+          currRole ?? ""
+        );
 
         setDisabledOrders((prev) => ({
           ...prev,
@@ -251,7 +258,9 @@ export function OrdersView() {
                   <div className="flex flex-wrap gap-x-8">
                     {order.workflow_state == "Billed" && (
                       <Button
-                        onClick={() => handleUpdate(order, "Paid")}
+                        onClick={() => {
+                          handleUpdate(order, "Paid");
+                        }}
                         size="sm"
                         className="bg-primary hover:bg-primary/90 text-white cursor-pointer flex items-center"
                       >
@@ -326,15 +335,35 @@ export function OrdersView() {
                       )}
 
                     {order.workflow_state == "In Progress" && (
-                      <Button
-                        onClick={() => handleUpdate(order, "Ready")}
-                        size="sm"
-                        className="bg-primary hover:bg-primary/90 text-white cursor-pointer flex items-center"
-                        disabled={disabledOrders[order.name] ?? false}
-                      >
-                        <BookCheck className="w-4 h-4 mr-1" />
-                        Ready
-                      </Button>
+                      <>
+                        {order.custom_approver ? (
+                          <Button
+                            onClick={() => handleUpdate(order, "Ready")}
+                            size="sm"
+                            className="bg-primary hover:bg-primary/90 text-white cursor-pointer flex items-center"
+                            disabled={
+                              !(
+                                !order.custom_approver?.includes(
+                                  currRole ?? ""
+                                ) && order.custom_button_disabled === 1
+                              )
+                            }
+                          >
+                            <BookCheck className="w-4 h-4 mr-1" />
+                            Ready
+                          </Button>
+                        ) : (
+                          <Button
+                            onClick={() => handleUpdate(order, "Ready")}
+                            size="sm"
+                            className="bg-primary hover:bg-primary/90 text-white cursor-pointer flex items-center"
+                            disabled={disabledOrders[order.name]}
+                          >
+                            <BookCheck className="w-4 h-4 mr-1" />
+                            Ready
+                          </Button>
+                        )}
+                      </>
                     )}
                     {order.workflow_state == "Served" &&
                       currRole == "Waiter" && (

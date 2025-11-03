@@ -221,7 +221,8 @@ export const orderAPI = {
     const response = await api.post("/resource/Sales Order", formattedBody);
     return response.data;
   },
-  updateApprovalDigit: async (ordername: string) => {
+
+  updateApprovalDigit: async (ordername: string, currRole: string) => {
     const getResponse = await api.get(`/resource/Sales Order/${ordername}`);
     const currentDigit = getResponse.data.data.custom_approval_digit;
     console.log(currentDigit, "bp");
@@ -230,13 +231,20 @@ export const orderAPI = {
     await api.put(`/resource/Sales Order/${ordername}`, {
       custom_approval_digit: newDigit,
       custom_button_disabled: 1,
+      custom_approver: currRole,
     });
+    const updatedOrder = await api.get(`/resource/Sales Order/${ordername}`);
 
     return {
       success: newDigit >= 2,
       currentDigit: newDigit,
-      
+      updatedOrder: updatedOrder.data,
     };
+  },
+
+  fetchOrderById: async (ordername: string) => {
+    const res = await api.get(`/resource/Sales Order/${ordername}`);
+    return res.data.data;
   },
 };
 export const approvalWorkflow = {
