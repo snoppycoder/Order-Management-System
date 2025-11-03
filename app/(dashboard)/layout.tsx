@@ -62,7 +62,7 @@ export default function DashboardLayout({
                   break;
                 }
               }
-              let currRole = localStorage.getItem("role") ?? "Waiter";
+              const currRole = localStorage.getItem("role") ?? "Waiter";
               console.log(currRole, "try");
 
               setInitials(roleInitials[currRole] || "");
