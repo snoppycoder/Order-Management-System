@@ -226,6 +226,7 @@ export const orderAPI = {
     const currentDigit = getResponse.data.data.custom_approval_digit;
     console.log(currentDigit, "bp");
     const newDigit = currentDigit + 1;
+
     await api.put(`/resource/Sales Order/${ordername}`, {
       custom_approval_digit: newDigit,
     });
