@@ -22,6 +22,26 @@ interface OrderSummaryProps {
   onUpdateQuantity: (itemId: string, index: number, quantity: number) => void;
   onSubmitOrder: () => void;
 }
+export const calculateItemPrice = (item: OrderItem) => {
+  let price = item.price_list_rate ?? 0;
+
+  // if (item.variant === "Small") price = 249;
+  // else if (item.variant === "Medium") price = 299;
+  // else if (item.variant === "Large") price = 399;
+
+  if (item.addOns && item.addOns.length > 0) {
+    const addOnPrices = item.itemAddOn!;
+
+    item.addOns.forEach((selectedAddOnName) => {
+      const addon = addOnPrices.find((a) => a.name === selectedAddOnName);
+      if (addon) {
+        price += addon.price;
+      }
+    });
+  }
+
+  return price;
+};
 
 export function OrderSummary({
   items,
@@ -29,33 +49,12 @@ export function OrderSummary({
   onUpdateQuantity,
   onSubmitOrder,
 }: OrderSummaryProps) {
-  console.log(items, "summary");
-  const calculateItemPrice = (item: OrderItem) => {
-    let price = item.price_list_rate ?? 0;
-
-    // if (item.variant === "Small") price = 249;
-    // else if (item.variant === "Medium") price = 299;
-    // else if (item.variant === "Large") price = 399;
-
-    if (item.addOns && item.addOns.length > 0) {
-      const addOnPrices = item.itemAddOn!;
-
-      item.addOns.forEach((selectedAddOnName) => {
-        const addon = addOnPrices.find((a) => a.name === selectedAddOnName);
-        if (addon) {
-          price += addon.price;
-        }
-      });
-    }
-
-    return price;
-  };
-  const total = items.reduce(
+  const subTotal = items.reduce(
     (sum, item) => sum + calculateItemPrice(item) * item.quantity,
     0
   );
-  // const tax = Math.round(subtotal * 0.05);
-  // const total = subtotal + tax;
+  const tax = subTotal * 0.15;
+  const total = tax + subTotal;
 
   return (
     <Card className="p-4 sticky top-6">
@@ -136,14 +135,14 @@ export function OrderSummary({
       </div>
 
       <div className="border-t border-gray-200 pt-3 space-y-2 text-sm">
-        {/* <div className="flex justify-between text-gray-600">
+        <div className="flex justify-between text-gray-600">
           <span>Subtotal</span>
-          <span>{subtotal} Birr</span>
-        </div> */}
-        {/* <div className="flex justify-between text-gray-600">
-          <span>Tax (5%)</span>
+          <span>{subTotal} Birr</span>
+        </div>
+        <div className="flex justify-between text-gray-600">
+          <span>Tax (15%)</span>
           <span>{tax} Birr</span>
-        </div> */}
+        </div>
         <div className="flex justify-between font-bold text-lg text-gray-900 bg-blue-50 p-2 rounded">
           <span>Total</span>
           <span className="text-primary">{total} Birr</span>

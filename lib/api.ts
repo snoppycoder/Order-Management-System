@@ -1,5 +1,6 @@
 /// <reference types="node" />
 
+import { calculateItemPrice } from "@/components/order-summary";
 import { posItem, submittableOrder } from "@/components/pos-interface";
 import axios from "axios";
 import qs from "qs";
@@ -198,9 +199,12 @@ export const orderAPI = {
     const items: posItem[] = body.items;
     const reconItems = items.map((item, _) => {
       const { quantity, ...rest } = item;
+      const price = calculateItemPrice(item);
+
       return {
         ...rest,
         qty: quantity,
+        price_list_rate: price,
         item_code: item.name,
         warehouse: "Finished Goods - RLRD",
       };
@@ -216,6 +220,7 @@ export const orderAPI = {
       custom_table_number: `Table-${body.custom_table_number}`,
       custom_room: body.custom_room,
       custom_order_type: body.order_type,
+      taxes_and_charges: "Ethiopia Tax",
     };
 
     const response = await api.post("/resource/Sales Order", formattedBody);

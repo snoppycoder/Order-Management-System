@@ -356,7 +356,7 @@ export function OrdersView() {
                           <Button
                             onClick={() => handleUpdate(order, "Ready")}
                             size="sm"
-                            className="bg-primary hover:bg-primary/90 text-white cursor-pointer flex items-center"
+                            className="bg-primary hover:bg-primary/90 text-white crsor-pointer flex items-center"
                             disabled={disabledOrders[order.name]}
                           >
                             <BookCheck className="w-4 h-4 mr-1" />
