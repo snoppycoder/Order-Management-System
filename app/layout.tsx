@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Resturant Management System",
+  title: "Restaurant Management System",
   description: "Made by Bisho Team",
   icons: {
     icon: "/favicon.png",

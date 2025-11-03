@@ -34,7 +34,6 @@ export default function DashboardLayout({
     Admin: "AD",
     Bartender: "BT",
   };
-  let init;
   useEffect(() => {
     const fetchSession = async () => {
       try {
@@ -80,9 +79,9 @@ export default function DashboardLayout({
   }, []);
 
   const handleLogout = async () => {
+    router.replace("/login");
     await authAPI.logout();
     localStorage.clear();
-    router.replace("/login");
 
     setIsLoggedIn(false);
     setUser(null);

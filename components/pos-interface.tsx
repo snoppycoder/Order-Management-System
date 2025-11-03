@@ -30,7 +30,7 @@ export interface submittableOrder {
   waiter: string;
   delivery_date: string;
   transaction_date: string;
-
+  order_type: string;
   items: posItem[];
   custom_table_number: string;
   custom_room: string;
@@ -48,6 +48,10 @@ export function POSInterface({ user, onLogout }: POSInterfaceProps) {
   const [selectedTable, setSelectedTable] = useState<string>("1");
   const [cartItems, setCartItems] = useState<posItem[]>([]);
   const [customerName, setCustomerName] = useState("");
+  const [orderType, setOrderType] = useState<"Bar" | "Restaurant" | "Both">(
+    "Restaurant"
+  );
+  const orderTypeArr = ["Bar", "Restaurant", "Both"];
   const role = localStorage.getItem("role");
   useEffect(() => {
     if (role === "Cashier" || role === "Chef") {
@@ -131,13 +135,14 @@ export function POSInterface({ user, onLogout }: POSInterfaceProps) {
     }
 
     const orderObj: submittableOrder = {
-      customer: customerName || "Aderaw", // if the customer is not in the db add later on
+      customer: customerName || "ruelux", // if the customer is not in the db add later on
       waiter: localStorage.getItem("email") || "zena@gmail.com",
       delivery_date: new Date().toISOString().split("T")[0],
       transaction_date: new Date().toISOString().split("T")[0],
       items: cartItems,
       custom_table_number: selectedTable,
       custom_room: selectedRoom,
+      order_type: orderType,
     };
 
     try {
@@ -243,7 +248,7 @@ export function POSInterface({ user, onLogout }: POSInterfaceProps) {
               </Card>
 
               <Card className="p-4">
-                <h3 className="font-semibold text-gray-900 mb-3">
+                <h3 className="font-semibold text-gray-900">
                   Customer Details
                 </h3>
                 <div>
@@ -257,6 +262,25 @@ export function POSInterface({ user, onLogout }: POSInterfaceProps) {
                     onChange={(e) => setCustomerName(e.target.value)}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Order type <span className="text-red-400">*</span>
+                  </label>
+                  <select
+                    value={orderType}
+                    required
+                    onChange={(e) =>
+                      setOrderType(e.target.value as typeof orderType)
+                    }
+                    className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    {orderTypeArr.map((room) => (
+                      <option key={room} value={room}>
+                        {room}
+                      </option>
+                    ))}
+                  </select>
                 </div>
               </Card>
 
