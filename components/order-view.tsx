@@ -29,7 +29,7 @@ interface Order {
   custom_table_number: string;
   custom_customer_name: string;
   items: Item[];
-  base_grand_total: number;
+  total: number;
   status: "Billed" | "Paid";
   timestamp: string;
   custom_order_type: string;
@@ -250,7 +250,7 @@ export function OrdersView() {
 
                 {(currRole == "Cashier" || currRole == "Waiter") && (
                   <div className="flex justify-center items-center font-bold text-base sm:text-lg text-gray-900 text-center">
-                    Total: {order.base_grand_total} Birr
+                    Total: {order.total} Birr
                   </div>
                 )}
 

@@ -6,7 +6,7 @@ import { Trash2, Plus, Minus } from "lucide-react";
 import { AddOn } from "./menu-browser";
 
 export interface OrderItem {
-  idx: number;
+  id: string;
   name: string;
   addOns?: string[];
   price_list_rate: number;
@@ -54,8 +54,7 @@ export function OrderSummary({
     0
   );
   const tax = subTotal * 0.15;
-  const serviceFee = subTotal * 0.1;
-  const total = tax + subTotal + serviceFee;
+  const total = tax + subTotal;
 
   return (
     <Card className="p-4 sticky top-6">
@@ -71,7 +70,7 @@ export function OrderSummary({
             const itemPrice = calculateItemPrice(item);
             return (
               <div
-                key={`${item.idx}-${index}`}
+                key={`${item.id}-${index}`}
                 className="bg-gray-50 p-3 rounded border border-gray-200"
               >
                 <div className="flex items-start justify-between mb-2">
@@ -104,11 +103,7 @@ export function OrderSummary({
                   <div className="flex items-center gap-2">
                     <button
                       onClick={() =>
-                        onUpdateQuantity(
-                          item.idx.toString(),
-                          index,
-                          item.quantity - 1
-                        )
+                        onUpdateQuantity(item.id, index, item.quantity - 1)
                       }
                       className="p-1 hover:bg-gray-200 rounded"
                     >
@@ -119,11 +114,7 @@ export function OrderSummary({
                     </span>
                     <button
                       onClick={() =>
-                        onUpdateQuantity(
-                          item.idx.toString(),
-                          index,
-                          item.quantity + 1
-                        )
+                        onUpdateQuantity(item.id, index, item.quantity + 1)
                       }
                       className="p-1 hover:bg-gray-200 rounded"
                     >
@@ -131,7 +122,7 @@ export function OrderSummary({
                     </button>
                   </div>
                   <button
-                    onClick={() => onRemoveItem(item.idx.toString(), index)}
+                    onClick={() => onRemoveItem(item.id, index)}
                     className="p-1 hover:bg-red-100 rounded text-red-600"
                   >
                     <Trash2 className="w-3 h-3" />
@@ -151,10 +142,6 @@ export function OrderSummary({
         <div className="flex justify-between text-gray-600">
           <span>Tax (15%)</span>
           <span>{tax} Birr</span>
-        </div>
-        <div className="flex justify-between text-gray-600">
-          <span>Service fee (10%)</span>
-          <span>{serviceFee} Birr</span>
         </div>
         <div className="flex justify-between font-bold text-lg text-gray-900 bg-blue-50 p-2 rounded">
           <span>Total</span>

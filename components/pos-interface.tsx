@@ -15,16 +15,14 @@ interface POSInterfaceProps {
   onLogout: () => void;
 }
 export interface posItem {
-  idx: number;
+  id: string;
   name: string;
   price_list_rate: number;
   quantity: number;
   custom_variant_items?: string;
-  custom_item_type?: string;
   custom_special_instruction?: string;
   itemAddOn?: AddOn[];
   custom_add_ons?: string;
-
   addOns?: string[];
 }
 export interface submittableOrder {
@@ -73,14 +71,13 @@ export function POSInterface({ user, onLogout }: POSInterfaceProps) {
   const handleAddItem = (item: posItem) => {
     const customAddOnsString = item.addOns?.join(", ") || "";
     setCartItems((prev) => {
-      const existingItem = prev.find((i) => i.idx === item.idx);
+      const existingItem = prev.find((i) => i.name === item.name);
 
       if (existingItem) {
         return prev.map((i) =>
-          i.idx === item.idx
+          i.id === item.id
             ? {
                 ...i,
-
                 quantity: i.quantity + (item.quantity || 1),
                 itemAddOn: item.itemAddOn || i.itemAddOn,
                 addOns: item.addOns || i.addOns,
@@ -99,8 +96,7 @@ export function POSInterface({ user, onLogout }: POSInterfaceProps) {
       return [
         ...prev,
         {
-          idx: item.idx,
-
+          id: item.id,
           name: item.name,
           price_list_rate: item.price_list_rate,
           quantity: item.quantity || 1,
