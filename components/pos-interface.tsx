@@ -24,7 +24,7 @@ export interface posItem {
   custom_special_instruction?: string;
   itemAddOn?: AddOn[];
   custom_add_ons?: string;
-  idx: number;
+  idx: string;
   addOns?: string[];
 }
 export interface submittableOrder {
