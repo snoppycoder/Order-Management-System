@@ -54,7 +54,8 @@ export function OrderSummary({
     0
   );
   const tax = subTotal * 0.15;
-  const total = tax + subTotal;
+  const serviceFee = subTotal * 0.1;
+  const total = tax + subTotal + serviceFee;
 
   return (
     <Card className="p-4 sticky top-6">
@@ -142,6 +143,10 @@ export function OrderSummary({
         <div className="flex justify-between text-gray-600">
           <span>Tax (15%)</span>
           <span>{tax} Birr</span>
+        </div>
+        <div className="flex justify-between text-gray-600">
+          <span>Service fee (10%)</span>
+          <span>{serviceFee} Birr</span>
         </div>
         <div className="flex justify-between font-bold text-lg text-gray-900 bg-blue-50 p-2 rounded">
           <span>Total</span>

@@ -220,7 +220,21 @@ export const orderAPI = {
       custom_table_number: `Table-${body.custom_table_number}`,
       custom_room: body.custom_room,
       custom_order_type: body.order_type,
-      taxes_and_charges: "Ethiopia Tax",
+      // taxes_and_charges: "Ethiopia Tax - RLR",
+      taxes: [
+        {
+          charge_type: "On Net Total",
+          account_head: "VAT - RLRD",
+          rate: 15,
+          description: "VAT",
+        },
+        {
+          charge_type: "On Net Total",
+          account_head: "VAT - RLRD",
+          rate: 10, //
+          description: "Service charge",
+        },
+      ],
     };
 
     const response = await api.post("/resource/Sales Order", formattedBody);
