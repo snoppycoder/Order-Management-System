@@ -15,7 +15,7 @@ interface POSInterfaceProps {
   onLogout: () => void;
 }
 export interface posItem {
-  id: string;
+  idx: number;
   name: string;
   price_list_rate: number;
   quantity: number;
@@ -24,7 +24,7 @@ export interface posItem {
   custom_special_instruction?: string;
   itemAddOn?: AddOn[];
   custom_add_ons?: string;
-  idx: string;
+
   addOns?: string[];
 }
 export interface submittableOrder {
@@ -99,8 +99,8 @@ export function POSInterface({ user, onLogout }: POSInterfaceProps) {
       return [
         ...prev,
         {
-          id: item.id,
           idx: item.idx,
+
           name: item.name,
           price_list_rate: item.price_list_rate,
           quantity: item.quantity || 1,

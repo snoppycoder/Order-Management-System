@@ -6,7 +6,7 @@ import { Trash2, Plus, Minus } from "lucide-react";
 import { AddOn } from "./menu-browser";
 
 export interface OrderItem {
-  id: string;
+  idx: number;
   name: string;
   addOns?: string[];
   price_list_rate: number;
@@ -71,7 +71,7 @@ export function OrderSummary({
             const itemPrice = calculateItemPrice(item);
             return (
               <div
-                key={`${item.id}-${index}`}
+                key={`${item.idx}-${index}`}
                 className="bg-gray-50 p-3 rounded border border-gray-200"
               >
                 <div className="flex items-start justify-between mb-2">
@@ -104,7 +104,11 @@ export function OrderSummary({
                   <div className="flex items-center gap-2">
                     <button
                       onClick={() =>
-                        onUpdateQuantity(item.id, index, item.quantity - 1)
+                        onUpdateQuantity(
+                          item.idx.toString(),
+                          index,
+                          item.quantity - 1
+                        )
                       }
                       className="p-1 hover:bg-gray-200 rounded"
                     >
@@ -115,7 +119,11 @@ export function OrderSummary({
                     </span>
                     <button
                       onClick={() =>
-                        onUpdateQuantity(item.id, index, item.quantity + 1)
+                        onUpdateQuantity(
+                          item.idx.toString(),
+                          index,
+                          item.quantity + 1
+                        )
                       }
                       className="p-1 hover:bg-gray-200 rounded"
                     >
@@ -123,7 +131,7 @@ export function OrderSummary({
                     </button>
                   </div>
                   <button
-                    onClick={() => onRemoveItem(item.id, index)}
+                    onClick={() => onRemoveItem(item.idx.toString(), index)}
                     className="p-1 hover:bg-red-100 rounded text-red-600"
                   >
                     <Trash2 className="w-3 h-3" />

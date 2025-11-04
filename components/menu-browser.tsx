@@ -16,7 +16,7 @@ export interface AddOn {
   idx: number;
 }
 export interface MenuItem {
-  id: string;
+  idx: number;
   name: string;
   item_code?: string;
   category: string;
@@ -70,7 +70,8 @@ export function MenuBrowser({ onAddItem }: MenuBrowserProps) {
     const fetchMenu = async () => {
       const response = await menuAPI.getMenuItems();
       const items = Array.isArray(response) ? response : response?.data || [];
-     
+      console.log(items, "menu");
+
       localStorage.setItem(
         MENU_CACHE_KEY,
         JSON.stringify({ items, timestamp: Date.now() })
