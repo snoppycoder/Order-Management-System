@@ -16,10 +16,12 @@ interface POSInterfaceProps {
 }
 export interface posItem {
   id: string;
+  idx?: number;
   name: string;
   price_list_rate: number;
   quantity: number;
   custom_variant_items?: string;
+  custom_item_type?: string;
   custom_special_instruction?: string;
   itemAddOn?: AddOn[];
   custom_add_ons?: string;
@@ -39,7 +41,6 @@ interface Item {
   id: string;
   name: string;
   price_list_rate: number;
-
   quantity?: number; // since we are going from menu order which has no quantity to an order object which does have quantity
 }
 export function POSInterface({ user, onLogout }: POSInterfaceProps) {
@@ -69,16 +70,20 @@ export function POSInterface({ user, onLogout }: POSInterfaceProps) {
   const currentRoom = rooms.find((r) => r.id === selectedRoom);
 
   const handleAddItem = (item: posItem) => {
+    console.log(item);
     const customAddOnsString = item.addOns?.join(", ") || "";
     setCartItems((prev) => {
-      const existingItem = prev.find((i) => i.name === item.name);
+      const existingItem = prev.find(
+        (i) => i.name + (i.idx ?? "") == item.name + (i.idx ?? "")
+      );
 
       if (existingItem) {
         return prev.map((i) =>
-          i.id === item.id
+          i.name === item.name
             ? {
                 ...i,
                 quantity: i.quantity + (item.quantity || 1),
+                idx: i.idx,
                 itemAddOn: item.itemAddOn || i.itemAddOn,
                 addOns: item.addOns || i.addOns,
                 custom_special_instruction:
@@ -97,6 +102,7 @@ export function POSInterface({ user, onLogout }: POSInterfaceProps) {
         ...prev,
         {
           id: item.id,
+          idx: item.idx,
           name: item.name,
           price_list_rate: item.price_list_rate,
           quantity: item.quantity || 1,
