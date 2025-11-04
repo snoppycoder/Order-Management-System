@@ -20,6 +20,7 @@ export interface posItem {
   price_list_rate: number;
   quantity: number;
   custom_variant_items?: string;
+  custom_item_type?: string;
   custom_special_instruction?: string;
   itemAddOn?: AddOn[];
   custom_add_ons?: string;
