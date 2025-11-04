@@ -52,7 +52,8 @@ export function ProductModal({
     const addOn = ADD_ONS?.find((a) => a.name === addOnName);
     return sum + (addOn?.price || 0);
   }, 0);
-  const itemTotal = addOnsTotal + (variantPrice ?? 0 * quantity);
+  const itemTotal =
+    variantPrice + addOnsTotal + item.price_list_rate * quantity;
 
   const handleAddOnToggle = (addOnName: string) => {
     setSelectedAddOns((prev) =>
