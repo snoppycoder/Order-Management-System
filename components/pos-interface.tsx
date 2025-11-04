@@ -24,6 +24,7 @@ export interface posItem {
   custom_special_instruction?: string;
   itemAddOn?: AddOn[];
   custom_add_ons?: string;
+  idx: number;
   addOns?: string[];
 }
 export interface submittableOrder {
@@ -72,13 +73,14 @@ export function POSInterface({ user, onLogout }: POSInterfaceProps) {
   const handleAddItem = (item: posItem) => {
     const customAddOnsString = item.addOns?.join(", ") || "";
     setCartItems((prev) => {
-      const existingItem = prev.find((i) => i.name === item.name);
+      const existingItem = prev.find((i) => i.idx === item.idx);
 
       if (existingItem) {
         return prev.map((i) =>
-          i.id === item.id
+          i.idx === item.idx
             ? {
                 ...i,
+
                 quantity: i.quantity + (item.quantity || 1),
                 itemAddOn: item.itemAddOn || i.itemAddOn,
                 addOns: item.addOns || i.addOns,
@@ -98,6 +100,7 @@ export function POSInterface({ user, onLogout }: POSInterfaceProps) {
         ...prev,
         {
           id: item.id,
+          idx: item.idx,
           name: item.name,
           price_list_rate: item.price_list_rate,
           quantity: item.quantity || 1,
