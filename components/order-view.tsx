@@ -114,11 +114,15 @@ export function OrdersView() {
           newOnes.length > 0 &&
           (role == "Chef" || role == "Bartender")
         ) {
-          audio
-            .play()
-            .catch((err) =>
-              console.warn("Audio play prevented by browser:", err)
-            );
+          if (
+            "Notification" in window &&
+            Notification.permission === "granted"
+          ) {
+            new Notification("New Order Received");
+            audio.play().catch(console.warn);
+          } else {
+            Notification.requestPermission();
+          }
           navigator.vibrate(200);
         }
 

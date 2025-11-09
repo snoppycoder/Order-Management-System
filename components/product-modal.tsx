@@ -54,12 +54,11 @@ export function ProductModal({
   const VARIANTS = [
     { name: "Small", price: -item.price_list_rate * 0.5 },
     { name: "Medium", price: 0 },
-    { name: "Large", price: item.price_list_rate * 0.5 },
+    { name: "Large", price: +item.price_list_rate * 0.5 },
   ]; // just a workaround
 
   const variantPrice =
-    VARIANTS.find((v) => v.name === selectedVariant)?.price ||
-    item.price_list_rate;
+    VARIANTS.find((v) => v.name === selectedVariant)?.price ?? 0;
   const addOnsTotal = selectedAddOns.reduce((sum, addOnName) => {
     const addOn = ADD_ONS?.find((a) => a.name === addOnName);
     return sum + (addOn?.price || 0);
