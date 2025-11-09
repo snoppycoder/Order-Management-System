@@ -18,7 +18,6 @@ import { Toaster, toast } from "sonner";
 import { approvalWorkflow, menuAPI, orderAPI } from "@/lib/api";
 import { MenuItem } from "./menu-browser";
 import OrderDetailModal from "./order-detail-modal";
-import { Socket } from "net";
 
 export interface Item {
   name: string;
