@@ -4,9 +4,7 @@ import { useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Plus, Search } from "lucide-react";
-import { useDebounce } from "@/hooks/useDebouce";
 import { ProductModal } from "./product-modal";
-import { OrderItem } from "./order-summary";
 import { menuAPI, orderAPI } from "@/lib/api";
 import { MENU_CACHE_KEY, CACHE_TTL } from "@/utils/constant";
 import { posItem } from "./pos-interface";
@@ -55,7 +53,7 @@ export function MenuBrowser({ onAddItem }: MenuBrowserProps) {
   const [selectedProduct, setSelectedProduct] = useState<MenuItem | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [menu, setMenu] = useState<frappeMenu[]>([]);
-  const currRole = localStorage.getItem("role");
+
 
   useEffect(() => {
     const cached = localStorage.getItem(MENU_CACHE_KEY);

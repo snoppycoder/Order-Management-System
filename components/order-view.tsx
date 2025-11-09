@@ -56,17 +56,9 @@ export function OrdersView() {
   const cashierTab = ["Served", "Billed", "Paid"];
   const adminTab = ["New", "In Progress", "Ready", "Served", "Billed", "Paid"];
   const bartenderTab = ["New", "In Progress", "Ready"];
-  const [disabledOrders, setDisabledOrders] = useState<{
-    [key: string]: boolean;
-  }>({});
-  const [latestOrder, setLatestOrder] = useState<string>("");
 
   const [selectedTab, setSelectedTab] = useState<string>();
   useEffect(() => {
-    const storedDisabledOrders = JSON.parse(
-      localStorage.getItem("disabledOrder") || "{}"
-    );
-    setDisabledOrders(storedDisabledOrders);
     if (currRole == "Waiter") {
       setViableTab(waiterTab);
       setSelectedTab(waiterTab[0]);
@@ -151,7 +143,7 @@ export function OrdersView() {
   if (!mounted) return null;
   if (!orders) return <div className="text-center">Loading orders...</div>;
 
-  if (currRole?.toLowerCase() == "Waiter".toLowerCase()) {
+  if (currRole == "Waiter") {
     const myOrder = orders.filter(
       (order) =>
         order.owner.toLowerCase() ===

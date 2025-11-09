@@ -156,7 +156,7 @@ export function POSInterface({ user, onLogout }: POSInterfaceProps) {
     };
 
     try {
-      localStorage.setItem("items", JSON.stringify(cartItems));
+    
       await orderAPI.createOrder(orderObj);
       toast.success("Order submitted successfully!");
       setActiveTab("orders");
