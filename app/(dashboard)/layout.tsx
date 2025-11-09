@@ -25,7 +25,15 @@ export default function DashboardLayout({
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [user, setUser] = useState<{ name: string; role: string } | null>(null);
   const [loading, setLoading] = useState(true);
-  const systemRoles = ["Waiter", "Cashier", "Chef", "Admin"];
+  const systemRoles = ["Waiter", "Cashier", "Chef", "Admin", "Bartender"];
+  const [initials, setInitials] = useState("");
+  const roleInitials: Record<string, string> = {
+    Waiter: "WT",
+    Cashier: "CS",
+    Chef: "CF",
+    Admin: "AD",
+    Bartender: "BT",
+  };
   useEffect(() => {
     const fetchSession = async () => {
       try {
@@ -54,6 +62,10 @@ export default function DashboardLayout({
                   break;
                 }
               }
+              const currRole = localStorage.getItem("role") ?? "Waiter";
+              console.log(currRole, "try");
+
+              setInitials(roleInitials[currRole] || "");
             }
           }
           setLoading(false);
@@ -67,9 +79,9 @@ export default function DashboardLayout({
   }, []);
 
   const handleLogout = async () => {
+    router.replace("/login");
     await authAPI.logout();
     localStorage.clear();
-    router.replace("/login");
 
     setIsLoggedIn(false);
     setUser(null);
@@ -104,7 +116,7 @@ export default function DashboardLayout({
                         }`}
                       >
                         <AvatarImage src="/admin-avatar.png" alt="Admin" />
-                        <AvatarFallback>WT</AvatarFallback>
+                        <AvatarFallback>{initials}</AvatarFallback>
                       </Avatar>
                     </Button>
                   </DropdownMenuTrigger>
