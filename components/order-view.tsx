@@ -123,6 +123,7 @@ export function OrdersView() {
           } else {
             Notification.requestPermission();
           }
+          audio.play().catch(console.warn);
           navigator.vibrate(200);
         }
 
