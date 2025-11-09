@@ -46,7 +46,6 @@ interface Order {
 
 export function OrdersView() {
   const [orders, setOrders] = useState<Order[]>();
-  const currRole = localStorage.getItem("role");
   const [open, setOpen] = useState(false);
   const [viableTab, setViableTab] = useState<string[]>([]);
   const [orderName, setOrderName] = useState<string>("");
@@ -57,17 +56,14 @@ export function OrdersView() {
   const cashierTab = ["Served", "Billed", "Paid"];
   const adminTab = ["New", "In Progress", "Ready", "Served", "Billed", "Paid"];
   const bartenderTab = ["New", "In Progress", "Ready"];
-  const [disabledOrders, setDisabledOrders] = useState<{
-    [key: string]: boolean;
-  }>({});
-  const [latestOrder, setLatestOrder] = useState<string>("");
 
+  const [latestOrder, setLatestOrder] = useState<string>("");
+  const [role, setRole] = useState<string>("");
   const [selectedTab, setSelectedTab] = useState<string>();
   useEffect(() => {
-    const storedDisabledOrders = JSON.parse(
-      localStorage.getItem("disabledOrder") || "{}"
-    );
-    setDisabledOrders(storedDisabledOrders);
+    const currRole = localStorage.getItem("role");
+    setRole(currRole ?? "");
+
     if (currRole == "Waiter") {
       setViableTab(waiterTab);
       setSelectedTab(waiterTab[0]);
@@ -84,7 +80,7 @@ export function OrdersView() {
       setViableTab(cashierTab);
       setSelectedTab(cashierTab[0]);
     }
-  }, [currRole]);
+  }, [role]);
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -116,7 +112,7 @@ export function OrdersView() {
         if (
           previousOrderNames.length > 0 &&
           newOnes.length > 0 &&
-          (currRole == "Chef" || currRole == "Bartender")
+          (role == "Chef" || role == "Bartender")
         ) {
           audio
             .play()
@@ -152,7 +148,7 @@ export function OrdersView() {
   if (!mounted) return null;
   if (!orders) return <div className="text-center">Loading orders...</div>;
 
-  if (currRole?.toLowerCase() == "Waiter".toLowerCase()) {
+  if (role?.toLowerCase() == "Waiter".toLowerCase()) {
     const myOrder = orders.filter(
       (order) =>
         order.owner.toLowerCase() ===
@@ -161,14 +157,14 @@ export function OrdersView() {
     filteredOrders = myOrder.filter(
       (order) => order.workflow_state === selectedTab
     );
-  } else if (currRole == "Bartender") {
+  } else if (role == "Bartender") {
     filteredOrders = orders.filter(
       (order) =>
         (order.custom_order_type == "Both" ||
           order.custom_order_type == "Bar") &&
         order.workflow_state == selectedTab
     );
-  } else if (currRole == "Chef") {
+  } else if (role == "Chef") {
     filteredOrders = orders.filter(
       (order) =>
         (order.custom_order_type == "Both" ||
@@ -262,7 +258,7 @@ export function OrdersView() {
                   </p>
                 </div>
 
-                {(currRole == "Cashier" || currRole == "Waiter") && (
+                {(role == "Cashier" || role == "Waiter") && (
                   <div className="flex justify-center items-center font-bold text-base sm:text-lg text-gray-900 text-center">
                     Total: {order.base_grand_total} Birr
                   </div>
@@ -271,7 +267,7 @@ export function OrdersView() {
                 <div className="flex justify-center items-center md:justify-end">
                   <div className="flex flex-wrap gap-x-8">
                     {order.workflow_state == "New" &&
-                      (currRole == "Chef" || currRole == "Admin") && (
+                      (role == "Chef" || role == "Admin") && (
                         <Button
                           onClick={() =>
                             handleUpdate(order.name, "In Progress")
@@ -285,10 +281,10 @@ export function OrdersView() {
                       )}
                     {(order.workflow_state == "New" ||
                       order.workflow_state == "In Progress") &&
-                      (currRole == "Chef" ||
-                        currRole == "Admin" ||
-                        currRole == "Bartender" ||
-                        currRole == "Waiter") && (
+                      (role == "Chef" ||
+                        role == "Admin" ||
+                        role == "Bartender" ||
+                        role == "Waiter") && (
                         <Button
                           onClick={() => {
                             setOpen(true);
@@ -301,7 +297,7 @@ export function OrdersView() {
                           Order Detail
                         </Button>
                       )}
-                    {order.workflow_state == "New" && currRole == "Waiter" && (
+                    {order.workflow_state == "New" && role == "Waiter" && (
                       <Button
                         size="sm"
                         disabled
@@ -325,7 +321,7 @@ export function OrdersView() {
                       </Button>
                     )}
 
-                    {order.workflow_state == "Ready" && currRole == "Chef" ? (
+                    {order.workflow_state == "Ready" && role == "Chef" ? (
                       <Button
                         size="sm"
                         disabled
@@ -338,7 +334,7 @@ export function OrdersView() {
                       <></>
                     )}
                     {order.workflow_state == "Ready" &&
-                      (currRole == "Waiter" || currRole == "Admin") && (
+                      (role == "Waiter" || role == "Admin") && (
                         <Button
                           onClick={() => handleUpdate(order.name, "Served")}
                           size="sm"
@@ -350,7 +346,7 @@ export function OrdersView() {
                       )}
 
                     {order.workflow_state == "In Progress" &&
-                      currRole == "Chef" && (
+                      role == "Chef" && (
                         <>
                           <Button
                             onClick={() => handleUpdate(order.name, "Ready")}
@@ -362,20 +358,19 @@ export function OrdersView() {
                           </Button>
                         </>
                       )}
-                    {order.workflow_state == "Served" &&
-                      currRole == "Waiter" && (
-                        <Button
-                          size="sm"
-                          disabled
-                          className="bg-gray-300 text-gray-700 flex items-center"
-                        >
-                          <DollarSign className="w-4 h-4 mr-1" />
-                          Bill
-                        </Button>
-                      )}
+                    {order.workflow_state == "Served" && role == "Waiter" && (
+                      <Button
+                        size="sm"
+                        disabled
+                        className="bg-gray-300 text-gray-700 flex items-center"
+                      >
+                        <DollarSign className="w-4 h-4 mr-1" />
+                        Bill
+                      </Button>
+                    )}
 
                     {order.workflow_state === "Served" &&
-                      (currRole == "Cashier" || currRole == "Admin") && (
+                      (role == "Cashier" || role == "Admin") && (
                         <Button
                           onClick={() => handleUpdate(order.name, "Billed")}
                           size="sm"

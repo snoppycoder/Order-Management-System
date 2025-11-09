@@ -26,9 +26,8 @@ interface ProductModalProps {
     specialInstructions: string,
     selectedVariant: string,
     addOns: string[],
-    selectPreference:string
+    selectPreference: string
   ) => void;
-
 }
 
 // const ADD_ONS = [
@@ -53,9 +52,9 @@ export function ProductModal({
 
   if (!isOpen || !item) return null;
   const VARIANTS = [
-    { name: "Small", price: item.price_list_rate - item.price_list_rate * 0.5 },
-    { name: "Medium", price: item.price_list_rate },
-    { name: "Large", price: item.price_list_rate + item.price_list_rate * 0.5 },
+    { name: "Small", price: -item.price_list_rate * 0.5 },
+    { name: "Medium", price: 0 },
+    { name: "Large", price: item.price_list_rate * 0.5 },
   ]; // just a workaround
 
   const variantPrice =
