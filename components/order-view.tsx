@@ -123,6 +123,7 @@ export function OrdersView() {
             .catch((err) =>
               console.warn("Audio play prevented by browser:", err)
             );
+          navigator.vibrate(200);
         }
 
         previousOrderNames = newOrderNames;
