@@ -56,7 +56,7 @@ export function POSInterface({ user, onLogout }: POSInterfaceProps) {
   const orderTypeArr = ["Bar", "Restaurant", "Both"];
   const role = localStorage.getItem("role");
   useEffect(() => {
-    if (role === "Cashier" || role === "Chef") {
+    if (role === "Cashier" || role === "Chef" || role == "Bartender") {
       setActiveTab("orders");
     } else {
       setActiveTab("order");
@@ -181,7 +181,7 @@ export function POSInterface({ user, onLogout }: POSInterfaceProps) {
 
       <main className="max-w-7xl mx-auto px-4 py-6">
         <div className="flex gap-2 mb-6">
-          {role !== "Cashier" && role !== "Chef" && (
+          {role !== "Cashier" && role !== "Chef" && role !== "Bartender" && (
             <Button
               onClick={() => setActiveTab("order")}
               className={`px-6 py-2 rounded-lg font-medium transition-colors ${

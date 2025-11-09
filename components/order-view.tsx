@@ -3,6 +3,7 @@
 import { Suspense, useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { io } from "socket.io-client";
 import {
   Printer,
   CreditCard,
@@ -17,6 +18,7 @@ import { Toaster, toast } from "sonner";
 import { approvalWorkflow, menuAPI, orderAPI } from "@/lib/api";
 import { MenuItem } from "./menu-browser";
 import OrderDetailModal from "./order-detail-modal";
+import { Socket } from "net";
 
 export interface Item {
   name: string;
@@ -58,6 +60,7 @@ export function OrdersView() {
   const [disabledOrders, setDisabledOrders] = useState<{
     [key: string]: boolean;
   }>({});
+  const [latestOrder, setLatestOrder] = useState<string>("");
 
   const [selectedTab, setSelectedTab] = useState<string>();
   useEffect(() => {
@@ -86,14 +89,44 @@ export function OrdersView() {
 
   useEffect(() => {
     setMounted(true);
+    // const socket = io("https://ruelux.k.erpnext.com/api/proxy", {
+    //   path: "/socket.io/",
+    //   transports: ["websocket"],
+    //   withCredentials: true,
+    // }); // will add this in constants
+    // // let us first establish a connection
+    // socket.on("connect", () => {
+    //   console.log("Connected with frappe server");
+    // });
 
+    let previousOrderNames: string[] = [];
     const fetchOrder = async () => {
       try {
+        const audio = new Audio("/notification.mp3");
+        // we will discern between vip/standard
         const res = await orderAPI.listOrder();
-        // const edited = await menuAPI.testMenuAPI();
-        // console.log(edited, "Here");
 
-        setOrders(Array.isArray(res) ? res : res.data || []);
+        const newOrders = Array.isArray(res) ? res : res.data || [];
+
+        const newOrderNames = newOrders.map((o: Order) => o.name);
+        const newOnes = newOrderNames.filter(
+          (name: string) => !previousOrderNames.includes(name)
+        );
+
+        if (
+          previousOrderNames.length > 0 &&
+          newOnes.length > 0 &&
+          (currRole == "Chef" || currRole == "Bartender")
+        ) {
+          audio
+            .play()
+            .catch((err) =>
+              console.warn("Audio play prevented by browser:", err)
+            );
+        }
+
+        previousOrderNames = newOrderNames;
+        setOrders(newOrders);
       } catch (error) {
         console.error("Failed to fetch orders:", error);
         toast.error("Failed to load orders");
@@ -101,6 +134,19 @@ export function OrdersView() {
     };
 
     fetchOrder();
+    const interval = setInterval(fetchOrder, 8_000);
+
+    return () => clearInterval(interval);
+
+    // socket.on("new_order", (data) => {
+    //   audio.play().catch(err => {
+    //   console.error("Error playing notification sound", err);
+    // });
+
+    //   console.log("new data", data);
+    //   fetchOrder();
+
+    // });
   }, []);
   if (!mounted) return null;
   if (!orders) return <div className="text-center">Loading orders...</div>;

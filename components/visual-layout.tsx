@@ -14,7 +14,7 @@ interface Room {
   tables: Table[];
 }
 
-export function RoomVisualLayout({
+export default function RoomVisualLayout({
   room,
   onTableStatusChange,
 }: {
