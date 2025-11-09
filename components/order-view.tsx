@@ -144,52 +144,17 @@ export function OrdersView() {
   //   );
   //   console.log(orders);
   // };
-  const handleUpdate = async (order: Order, status: string) => {
-    console.log(order, "to be updated");
+  const handleUpdate = async (orderId: string, status: string) => {
     try {
-      const orderId = order.name;
-      if (
-        order.custom_order_type == "Both" &&
-        order.workflow_state == "In Progress"
-      ) {
-        const res = await orderAPI.updateApprovalDigit(
-          order.name,
-          currRole ?? ""
-        );
+      setOrders((prev) =>
+        prev?.map((order) =>
+          order.name === orderId ? { ...order, workflow_state: status } : order
+        )
+      );
+      // toast.loading(`Processing your request for order: ${orderId}`);
+      await approvalWorkflow.update(status, orderId);
+      toast.success(`Sucessfully updated your request `);
 
-        setDisabledOrders((prev) => ({
-          ...prev,
-          [order.name]: order.custom_button_disabled === 0,
-        }));
-
-        if (res.success) {
-          setOrders((prev) =>
-            prev?.map((order) =>
-              order.name === orderId
-                ? { ...order, workflow_state: status }
-                : order
-            )
-          );
-          // toast.loading(`Processing your request for order: ${orderId}`);
-          await approvalWorkflow.update(status, orderId);
-          toast.success(`Sucessfully updated your request `);
-          return;
-        }
-        currRole == "Bartender"
-          ? toast.info("Waiting for the chef to update ")
-          : toast.info("Waiting for the bartender to update ");
-      } else {
-        setOrders((prev) =>
-          prev?.map((order) =>
-            order.name === orderId
-              ? { ...order, workflow_state: status }
-              : order
-          )
-        );
-        // toast.loading(`Processing your request for order: ${orderId}`);
-        await approvalWorkflow.update(status, orderId);
-        toast.success(`Sucessfully updated your request `);
-      }
       // await fetchOrder();
 
       // setOrders(orders.filter((order) => order.name !== orderId));
@@ -258,23 +223,12 @@ export function OrdersView() {
 
                 <div className="flex justify-center items-center md:justify-end">
                   <div className="flex flex-wrap gap-x-8">
-                    {order.workflow_state == "Billed" && (
-                      <Button
-                        onClick={() => {
-                          handleUpdate(order, "Paid");
-                        }}
-                        size="sm"
-                        className="bg-primary hover:bg-primary/90 text-white cursor-pointer flex items-center"
-                      >
-                        <DollarSign className="w-4 h-4 mr-1" />
-                        Pay
-                      </Button>
-                    )}
-
                     {order.workflow_state == "New" &&
                       (currRole == "Chef" || currRole == "Admin") && (
                         <Button
-                          onClick={() => handleUpdate(order, "In Progress")}
+                          onClick={() =>
+                            handleUpdate(order.name, "In Progress")
+                          }
                           size="sm"
                           className="bg-primary hover:bg-primary/90 text-white cursor-pointer flex items-center"
                         >
@@ -282,21 +236,11 @@ export function OrdersView() {
                           In Progress
                         </Button>
                       )}
-
-                    {order.workflow_state == "New" && currRole == "Waiter" && (
-                      <Button
-                        size="sm"
-                        disabled
-                        className="bg-gray-300 text-gray-700 flex items-center"
-                      >
-                        <Loader className="w-4 h-4 mr-1" />
-                        In Progress
-                      </Button>
-                    )}
-
-                    {order.workflow_state == "New" &&
+                    {(order.workflow_state == "New" ||
+                      order.workflow_state == "In Progress") &&
                       (currRole == "Chef" ||
                         currRole == "Admin" ||
+                        currRole == "Bartender" ||
                         currRole == "Waiter") && (
                         <Button
                           onClick={() => {
@@ -310,8 +254,31 @@ export function OrdersView() {
                           Order Detail
                         </Button>
                       )}
+                    {order.workflow_state == "New" && currRole == "Waiter" && (
+                      <Button
+                        size="sm"
+                        disabled
+                        className="bg-gray-300 text-gray-700 flex items-center"
+                      >
+                        <Loader className="w-4 h-4 mr-1" />
+                        In Progress
+                      </Button>
+                    )}
 
-                    {order.workflow_state == "Ready" && currRole == "Chef" && (
+                    {order.workflow_state == "Billed" && (
+                      <Button
+                        onClick={() => {
+                          handleUpdate(order.name, "Paid");
+                        }}
+                        size="sm"
+                        className="bg-primary hover:bg-primary/90 text-white cursor-pointer flex items-center"
+                      >
+                        <DollarSign className="w-4 h-4 mr-1" />
+                        Pay
+                      </Button>
+                    )}
+
+                    {order.workflow_state == "Ready" && currRole == "Chef" ? (
                       <Button
                         size="sm"
                         disabled
@@ -320,11 +287,13 @@ export function OrdersView() {
                         <HandPlatter className="w-4 h-4 mr-1" />
                         Served
                       </Button>
+                    ) : (
+                      <></>
                     )}
                     {order.workflow_state == "Ready" &&
                       (currRole == "Waiter" || currRole == "Admin") && (
                         <Button
-                          onClick={() => handleUpdate(order, "Served")}
+                          onClick={() => handleUpdate(order.name, "Served")}
                           size="sm"
                           className="bg-primary hover:bg-primary/90 text-white cursor-pointer flex items-center"
                         >
@@ -333,37 +302,19 @@ export function OrdersView() {
                         </Button>
                       )}
 
-                    {order.workflow_state == "In Progress" && (
-                      <>
-                        {order.custom_approver ? (
+                    {order.workflow_state == "In Progress" &&
+                      currRole == "Chef" && (
+                        <>
                           <Button
-                            onClick={() => handleUpdate(order, "Ready")}
+                            onClick={() => handleUpdate(order.name, "Ready")}
                             size="sm"
                             className="bg-primary hover:bg-primary/90 text-white cursor-pointer flex items-center"
-                            disabled={
-                              !(
-                                !order.custom_approver?.includes(
-                                  currRole ?? ""
-                                ) && order.custom_button_disabled === 1
-                              )
-                            }
                           >
                             <BookCheck className="w-4 h-4 mr-1" />
                             Ready
                           </Button>
-                        ) : (
-                          <Button
-                            onClick={() => handleUpdate(order, "Ready")}
-                            size="sm"
-                            className="bg-primary hover:bg-primary/90 text-white crsor-pointer flex items-center"
-                            disabled={disabledOrders[order.name]}
-                          >
-                            <BookCheck className="w-4 h-4 mr-1" />
-                            Ready
-                          </Button>
-                        )}
-                      </>
-                    )}
+                        </>
+                      )}
                     {order.workflow_state == "Served" &&
                       currRole == "Waiter" && (
                         <Button
@@ -379,7 +330,7 @@ export function OrdersView() {
                     {order.workflow_state === "Served" &&
                       (currRole == "Cashier" || currRole == "Admin") && (
                         <Button
-                          onClick={() => handleUpdate(order, "Billed")}
+                          onClick={() => handleUpdate(order.name, "Billed")}
                           size="sm"
                           className="bg-primary hover:bg-primary/90 text-white cursor-pointer flex items-center"
                         >
