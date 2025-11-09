@@ -45,7 +45,7 @@ interface Order {
 
 export function OrdersView() {
   const [orders, setOrders] = useState<Order[]>();
-  const currRole = localStorage.getItem("role");
+  
   const [open, setOpen] = useState(false);
   const [viableTab, setViableTab] = useState<string[]>([]);
   const [orderName, setOrderName] = useState<string>("");
@@ -58,6 +58,7 @@ export function OrdersView() {
   const bartenderTab = ["New", "In Progress", "Ready"];
 
   const [selectedTab, setSelectedTab] = useState<string>();
+  const currRole = localStorage.getItem("role");
   useEffect(() => {
     if (currRole == "Waiter") {
       setViableTab(waiterTab);

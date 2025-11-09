@@ -54,8 +54,9 @@ export function POSInterface({ user, onLogout }: POSInterfaceProps) {
     "Restaurant"
   );
   const orderTypeArr = ["Bar", "Restaurant", "Both"];
-  const role = localStorage.getItem("role");
+  let role = null
   useEffect(() => {
+    role = localStorage.getItem("role");
     if (role === "Cashier" || role === "Chef" || role == "Bartender") {
       setActiveTab("orders");
     } else {
