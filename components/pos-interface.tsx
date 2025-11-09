@@ -54,9 +54,8 @@ export function POSInterface({ user, onLogout }: POSInterfaceProps) {
     "Restaurant"
   );
   const orderTypeArr = ["Bar", "Restaurant", "Both"];
-  let role = null
+  const role = localStorage.getItem("role");
   useEffect(() => {
-    role = localStorage.getItem("role");
     if (role === "Cashier" || role === "Chef" || role == "Bartender") {
       setActiveTab("orders");
     } else {
@@ -157,7 +156,7 @@ export function POSInterface({ user, onLogout }: POSInterfaceProps) {
     };
 
     try {
-    
+      localStorage.setItem("items", JSON.stringify(cartItems));
       await orderAPI.createOrder(orderObj);
       toast.success("Order submitted successfully!");
       setActiveTab("orders");

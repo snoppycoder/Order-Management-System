@@ -31,15 +31,15 @@ export default function OrderDetailModal({
   ordername,
 }: OrderDetailModalProps) {
   const [order, setOrder] = useState<OrderItem[]>([]);
+  const currRole = localStorage.getItem("role");
 
   useEffect(() => {
-    const currRole = localStorage.getItem("role");
     if (!ordername) return;
 
     const fetchDescription = async () => {
       const res = await orderAPI.getOrderDetail(ordername);
       const response = res.data;
-
+      console.log("chefsss ", response);
       if (currRole == "Chef") {
         const chef = response.items.filter(
           (item: { item_group: string }) => item.item_group == "Consumable"

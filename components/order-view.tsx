@@ -18,6 +18,7 @@ import { Toaster, toast } from "sonner";
 import { approvalWorkflow, menuAPI, orderAPI } from "@/lib/api";
 import { MenuItem } from "./menu-browser";
 import OrderDetailModal from "./order-detail-modal";
+import { Socket } from "net";
 
 export interface Item {
   name: string;
@@ -45,7 +46,7 @@ interface Order {
 
 export function OrdersView() {
   const [orders, setOrders] = useState<Order[]>();
-  
+  const currRole = localStorage.getItem("role");
   const [open, setOpen] = useState(false);
   const [viableTab, setViableTab] = useState<string[]>([]);
   const [orderName, setOrderName] = useState<string>("");
@@ -56,10 +57,17 @@ export function OrdersView() {
   const cashierTab = ["Served", "Billed", "Paid"];
   const adminTab = ["New", "In Progress", "Ready", "Served", "Billed", "Paid"];
   const bartenderTab = ["New", "In Progress", "Ready"];
+  const [disabledOrders, setDisabledOrders] = useState<{
+    [key: string]: boolean;
+  }>({});
+  const [latestOrder, setLatestOrder] = useState<string>("");
 
   const [selectedTab, setSelectedTab] = useState<string>();
-  const currRole = localStorage.getItem("role");
   useEffect(() => {
+    const storedDisabledOrders = JSON.parse(
+      localStorage.getItem("disabledOrder") || "{}"
+    );
+    setDisabledOrders(storedDisabledOrders);
     if (currRole == "Waiter") {
       setViableTab(waiterTab);
       setSelectedTab(waiterTab[0]);
@@ -144,7 +152,7 @@ export function OrdersView() {
   if (!mounted) return null;
   if (!orders) return <div className="text-center">Loading orders...</div>;
 
-  if (currRole == "Waiter") {
+  if (currRole?.toLowerCase() == "Waiter".toLowerCase()) {
     const myOrder = orders.filter(
       (order) =>
         order.owner.toLowerCase() ===
