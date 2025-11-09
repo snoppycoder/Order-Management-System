@@ -26,6 +26,7 @@ export interface posItem {
   itemAddOn?: AddOn[];
   custom_add_ons?: string;
   addOns?: string[];
+  custom_serve_time?: string;
 }
 export interface submittableOrder {
   customer: string;
@@ -86,6 +87,8 @@ export function POSInterface({ user, onLogout }: POSInterfaceProps) {
                 idx: i.idx,
                 itemAddOn: item.itemAddOn || i.itemAddOn,
                 addOns: item.addOns || i.addOns,
+                custom_serve_time:
+                  item.custom_serve_time || i.custom_serve_time,
                 custom_special_instruction:
                   item.custom_special_instruction ||
                   i.custom_special_instruction,
@@ -110,6 +113,7 @@ export function POSInterface({ user, onLogout }: POSInterfaceProps) {
           addOns: item.addOns,
           custom_special_instruction: item.custom_special_instruction,
           custom_add_ons: customAddOnsString,
+          custom_serve_time: item.custom_serve_time,
           custom_variant_items: item.custom_variant_items,
         },
       ];

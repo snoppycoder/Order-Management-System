@@ -14,7 +14,7 @@ import {
 } from "lucide-react";
 
 import { Toaster, toast } from "sonner";
-import { approvalWorkflow, orderAPI } from "@/lib/api";
+import { approvalWorkflow, menuAPI, orderAPI } from "@/lib/api";
 import { MenuItem } from "./menu-browser";
 import OrderDetailModal from "./order-detail-modal";
 
@@ -90,7 +90,9 @@ export function OrdersView() {
     const fetchOrder = async () => {
       try {
         const res = await orderAPI.listOrder();
-        console.log(res, "orders");
+        // const edited = await menuAPI.testMenuAPI();
+        // console.log(edited, "Here");
+
         setOrders(Array.isArray(res) ? res : res.data || []);
       } catch (error) {
         console.error("Failed to fetch orders:", error);
@@ -270,9 +272,7 @@ export function OrdersView() {
                     )}
 
                     {order.workflow_state == "New" &&
-                      (currRole == "Chef" ||
-                        currRole == "Admin" ||
-                        currRole == "Bartender") && (
+                      (currRole == "Chef" || currRole == "Admin") && (
                         <Button
                           onClick={() => handleUpdate(order, "In Progress")}
                           size="sm"
@@ -296,7 +296,6 @@ export function OrdersView() {
 
                     {order.workflow_state == "New" &&
                       (currRole == "Chef" ||
-                        currRole == "Bartender" ||
                         currRole == "Admin" ||
                         currRole == "Waiter") && (
                         <Button

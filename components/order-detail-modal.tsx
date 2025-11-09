@@ -16,6 +16,7 @@ interface OrderItem {
   custom_add_ons: string;
   custom_special_instruction: string;
   custom_variant_items: string;
+  custom_serve_time: string;
 }
 
 interface OrderDetailModalProps {
@@ -88,8 +89,14 @@ export default function OrderDetailModal({
                   <span className="font-medium text-sm">Quantity</span>
                   <span className="font-medium">{item.qty}</span>
                 </div>
+                <div className="flex justify-between mt-2">
+                  <span className="font-medium text-sm">Serve time</span>
+                  <span className="font-semibold text-gray-800">
+                    {item.custom_serve_time}
+                  </span>
+                </div>
 
-                <div className="mt-4">
+                <div className="mt-2">
                   <p className="font-medium text-sm mb-2">Add-ons</p>
 
                   {item?.custom_add_ons?.length ? (

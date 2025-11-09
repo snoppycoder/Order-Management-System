@@ -6,6 +6,16 @@ import { Card } from "@/components/ui/card";
 import { X, Plus, Minus } from "lucide-react";
 import { MenuItem } from "./menu-browser";
 
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+
 interface ProductModalProps {
   item: MenuItem | null;
   isOpen: boolean;
@@ -15,8 +25,10 @@ interface ProductModalProps {
     quantity: number,
     specialInstructions: string,
     selectedVariant: string,
-    addOns: string[]
+    addOns: string[],
+    selectPreference:string
   ) => void;
+
 }
 
 // const ADD_ONS = [
@@ -35,6 +47,7 @@ export function ProductModal({
   const [quantity, setQuantity] = useState(1);
   const [specialInstructions, setSpecialInstructions] = useState("");
   const [selectedVariant, setSelectedVariant] = useState("Medium");
+  const [selectPreference, setSelectedPreference] = useState("With Meal");
   const [selectedAddOns, setSelectedAddOns] = useState<string[]>([]);
   const ADD_ONS = item?.itemAddOn;
 
@@ -71,7 +84,8 @@ export function ProductModal({
       quantity,
       specialInstructions,
       selectedVariant,
-      selectedAddOns
+      selectedAddOns,
+      selectPreference
     );
     setQuantity(1);
     setSpecialInstructions("");
@@ -133,9 +147,8 @@ export function ProductModal({
                   rows={3}
                 />
               </div>
-
-              <div className="lg:mb-2 lg:ml-2 lg:p-2 border border-gray-200 rounded-xl  ">
-                {ADD_ONS?.length !== 0 ? (
+              {ADD_ONS?.length !== 0 ? (
+                <div className="lg:mb-2 lg:ml-2 lg:p-2 border border-gray-200 rounded-xl  ">
                   <>
                     <h3 className="text-sm font-semibold text-gray-900 mb-2">
                       Add-ons
@@ -162,12 +175,48 @@ export function ProductModal({
                       ))}
                     </div>
                   </>
-                ) : (
-                  <></>
-                )}
-              </div>
+                </div>
+              ) : (
+                <></>
+              )}
             </div>
-
+            {item.item_group == "Beverages" ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:gap-4 gap-2">
+                <div className="py-2">
+                  <label className="block text-sm font-semibold text-gray-900 mb-1 ">
+                    Preference
+                  </label>
+                  <Select>
+                    <SelectTrigger className="w-[180px]">
+                      <SelectValue placeholder={selectPreference} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectGroup>
+                        <SelectLabel>Serve time preference</SelectLabel>
+                        <SelectItem
+                          value="With Meal"
+                          onClick={() => {
+                            setSelectedPreference("With Meal");
+                          }}
+                        >
+                          With Meal
+                        </SelectItem>
+                        <SelectItem
+                          value="Before Meal"
+                          onClick={() => {
+                            setSelectedPreference("Before Meal");
+                          }}
+                        >
+                          Before Meal
+                        </SelectItem>
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+            ) : (
+              <></>
+            )}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 md:gap-6 border-t pt-4">
               <div>
                 <h3 className="text-sm font-semibold text-gray-900 mb-1 md:mb-2">

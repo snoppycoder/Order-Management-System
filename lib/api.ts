@@ -167,6 +167,10 @@ export const menuAPI = {
 
     return itemsWithPrices;
   },
+  testMenuAPI: async () => {
+    const response = await api.get(`/resource/Sales Order Item?fields=["*"]`);
+    return response.data;
+  },
 };
 
 export const orderAPI = {
@@ -176,15 +180,6 @@ export const orderAPI = {
     );
 
     const orders = response.data.data || [];
-    const localItems = JSON.parse(localStorage.getItem("items") || "[]");
-
-    // if (localItems.length > 0 && orders.length > 0) {
-    //   const name = orders[0].name;
-    //   await api.put(`/resource/Sales Order/${name}`, {
-    //     custom_local_items: localItems,
-    //   });
-    // }
-    // localStorage.removeItem("items");
 
     return orders;
   },
@@ -199,6 +194,7 @@ export const orderAPI = {
     const items: posItem[] = body.items;
     const reconItems = items.map((item, _) => {
       const { quantity, ...rest } = item;
+
       const price = calculateItemPrice(item);
 
       return {
@@ -215,6 +211,7 @@ export const orderAPI = {
       transaction_date: new Date().toISOString().split("T")[0],
       delivery_date: body.delivery_date,
       items: reconItems,
+
       custom_waiter: body.waiter,
       custom_table_number: `Table-${body.custom_table_number}`,
       custom_room: body.custom_room,

@@ -80,6 +80,7 @@ export function MenuItemForm({ item, onSave, onClose }: MenuItemFormProps) {
       } else {
         onSave({
           ...formData,
+
           price_list_rate: numericPrice,
           itemAddOn: [],
         });

@@ -25,8 +25,9 @@ export interface MenuItem {
   available?: boolean | true;
   description?: string;
   itemAddOn: AddOn[];
+  item_group?: string;
+  custom_serve_time?: string;
 }
-
 interface MenuBrowserProps {
   onAddItem: (item: posItem) => void;
 }
@@ -97,12 +98,14 @@ export function MenuBrowser({ onAddItem }: MenuBrowserProps) {
     quantity: number,
     custom_special_instruction: string,
     selectedVariant: string,
-    addOns: string[]
+    addOns: string[],
+    selectPreference: string
   ) => {
     const existingItem = {
       ...item,
       quantity,
       custom_special_instruction,
+      custom_serve_time: selectPreference,
       custom_variant_items: selectedVariant,
       addOns,
     };
