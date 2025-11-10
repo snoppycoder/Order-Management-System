@@ -56,8 +56,6 @@ export function OrdersView() {
   const cashierTab = ["Served", "Billed", "Paid"];
   const adminTab = ["New", "In Progress", "Ready", "Served", "Billed", "Paid"];
   const bartenderTab = ["New", "In Progress", "Ready"];
-
-  const [latestOrder, setLatestOrder] = useState<string>("");
   const [role, setRole] = useState<string>("");
   const [selectedTab, setSelectedTab] = useState<string>();
   useEffect(() => {
@@ -80,7 +78,7 @@ export function OrdersView() {
       setViableTab(cashierTab);
       setSelectedTab(cashierTab[0]);
     }
-  }, [role]);
+  }, []);
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -94,37 +92,32 @@ export function OrdersView() {
     // socket.on("connect", () => {
     //   console.log("Connected with frappe server");
     // });
-
+    // if (!role) return;
     let previousOrderNames: string[] = [];
+    const audio = new Audio("/notification.mp3");
     const fetchOrder = async () => {
       try {
-        const audio = new Audio("/notification.mp3");
         // we will discern between vip/standard
         const res = await orderAPI.listOrder();
-
         const newOrders = Array.isArray(res) ? res : res.data || [];
-
         const newOrderNames = newOrders.map((o: Order) => o.name);
         const newOnes = newOrderNames.filter(
           (name: string) => !previousOrderNames.includes(name)
         );
 
-        if (
-          previousOrderNames.length > 0 &&
-          newOnes.length > 0 &&
-          (role == "Chef" || role == "Bartender")
-        ) {
-          if (
-            "Notification" in window &&
-            Notification.permission === "granted"
-          ) {
-            new Notification("New Order Received");
-            audio.play().catch(console.warn);
-          } else {
-            Notification.requestPermission();
+        if (previousOrderNames.length > 0 && newOnes.length > 0) {
+          const currRole = role ?? localStorage.getItem("role");
+          if (currRole == "Chef" || currRole == "Bartender") {
+            if (
+              "Notification" in window &&
+              Notification.permission === "granted"
+            ) {
+              new Notification("New Order Received");
+            } else {
+              audio.play().catch(console.warn);
+              Notification.requestPermission();
+            }
           }
-          audio.play().catch(console.warn);
-          navigator.vibrate(200);
         }
 
         previousOrderNames = newOrderNames;
