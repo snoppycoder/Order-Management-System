@@ -106,7 +106,9 @@ export function OrdersView() {
         );
 
         if (previousOrderNames.length > 0 && newOnes.length > 0) {
-          const currRole = role ?? localStorage.getItem("role");
+          const currRole =
+            role.trim().length == 0 ? localStorage.getItem("role") : role;
+
           if (currRole == "Chef" || currRole == "Bartender") {
             if (
               "Notification" in window &&
