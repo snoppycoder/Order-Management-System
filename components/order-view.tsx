@@ -12,6 +12,7 @@ import {
   HandPlatter,
   BookCheck,
   Hamburger,
+  PrinterIcon,
 } from "lucide-react";
 
 import { Toaster, toast } from "sonner";
@@ -19,13 +20,15 @@ import { approvalWorkflow, menuAPI, orderAPI } from "@/lib/api";
 import { MenuItem } from "./menu-browser";
 import OrderDetailModal from "./order-detail-modal";
 import { Socket } from "net";
+import { printOrderSlip } from "@/utils/print-order-slip";
 
 export interface Item {
-  name: string;
-  quantity: number;
-  price: number;
+  item_name: string;
+  description: string;
+  qty: number;
+  price_list_rate: number;
 }
-interface Order {
+export interface Order {
   name: string;
   custom_room: string;
   custom_table_number: string;
@@ -177,16 +180,10 @@ export function OrdersView() {
     );
   }
 
-  // const handlePrint = (orderId: string) => {
-  //   toast.loading(`Printing KOT and receipt for order ${orderId}`);
-  //   // Update status to Draft after printing
-  //   setOrders(
-  //     orders.map((order) =>
-  //       order.name === orderId ? { ...order, status: "Billed" } : order
-  //     )
-  //   );
-  //   console.log(orders);
-  // };
+  const handlePrint = async (order: Order) => {
+    console.log("Printing order slip for order:", order);
+    printOrderSlip(order);
+  };
   const handleUpdate = async (orderId: string, status: string) => {
     try {
       setOrders((prev) =>
@@ -336,7 +333,10 @@ export function OrdersView() {
                     {order.workflow_state == "Ready" &&
                       (role == "Waiter" || role == "Admin") && (
                         <Button
-                          onClick={() => handleUpdate(order.name, "Served")}
+                          onClick={() => {
+                            handleUpdate(order.name, "Served");
+                            handlePrint(order);
+                          }}
                           size="sm"
                           className="bg-primary hover:bg-primary/90 text-white cursor-pointer flex items-center"
                         >
